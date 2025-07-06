@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peron Tips</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #000;
+    }
+
+    header {
+      background-color: #2ecc71;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    header .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .menu-icon {
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      display: none;
+      flex-direction: column;
+      background-color: #2ecc71;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      min-width: 220px;
+      border-radius: 5px;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .dropdown a {
+      color: white;
+      padding: 12px;
+      text-decoration: none;
+      border-bottom: 1px solid #27ae60;
+    }
+
+    .dropdown a:hover {
+      background-color: #27ae60;
+    }
+
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .video-wrapper video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 10px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      text-decoration: none;
+    }
+
+    .button:hover {
+      background-color: #27ae60;
+    }
+
+    .note {
+      background-color: #111;
+      color: white;
+      padding: 20px;
+      margin: 30px auto;
+      border-radius: 8px;
+      max-width: 90%;
+    }
+
+    .note h3 {
+      color: gold;
+      margin-top: 0;
+    }
+
+    .orange-button {
+      background-color: orange;
+      color: black;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      header .logo {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header with dropdown menu -->
+<header>
+  <div class="logo">Peron Tips</div>
+  <div class="menu-icon" onclick="toggleDropdown()">☰</div>
+  <div class="dropdown" id="dropdown-menu">
+    <a href="index.html">Home</a>
+    <a href="high-school/high-school.html">High School Questions</a>
+    <a href="university/university.html">University Questions</a>
+    <a href="college/college.html">College Questions</a>
+    <a href="parents/parents.html">Parents</a>
+    <a href="illiterate/illiterate.html">Illiterate / Simple Knowledge</a>
+    <a href="professionals/professionals.html">Professionals / Working Class</a>
+    <a href="entrepreneurs/entrepreneurs.html">Entrepreneurs / Business Owners</a>
+    <a href="children/children.html">Children / Kids</a>
+    <a href="general/general.html">General Knowledge / Mixed</a>
+    <a href="tech/tech.html">Tech / Digital Skills</a>
+    <a href="health/health.html">Health & Lifestyle</a>
+    <!-- NEW links -->
+    <a href="bio.html">Founder Bio</a>
+    <a href="terms.html">Terms &amp; Conditions</a>
+  </div>
+</header>
+
+<div class="container">
+  <h2>WELCOME TO:</h2>
+  <h1>PERON TIPS</h1>
+
+  <!-- Auto-playing video with sound -->
+  <div class="video-wrapper">
+    <video id="introVideo" autoplay muted playsinline>
+      <source src="1749408547544.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <p><strong>CHOOSE YOUR QUIZ FIELDS NOW</strong></p>
+  <a href="page.html" class="button">CHOOSE YOUR QUIZ NOW</a>
+  <a href="refer.html" class="button orange-button">Refer Friends &amp; Earn</a>
+  <!-- NEW button -->
+  <a href="terms.html" class="button">Terms &amp; Conditions</a>
+
+  <div class="note">
+    <h3>Score Higher Per Section!</h3>
+    <p>
+      Every time you pass a quiz section with a perfect score, you’ll receive congratulations. Real knowledge!
+    </p>
+    <a href="disclaimer.html" class="button orange-button">View Disclaimer</a>
+    <p style="font-size: 12px; margin-top: 10px;">*Rewards subject to availability. Terms and conditions apply.</p>
+  </div>
+</div>
+
+<!-- Script for dropdown and video -->
+<script>
+  function toggleDropdown() {
+    var menu = document.getElementById("dropdown-menu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.menu-icon')) {
+      var dropdown = document.getElementById("dropdown-menu");
+      if (dropdown && dropdown.style.display === "flex") {
+        dropdown.style.display = "none";
+      }
+    }
+  }
+
+  // Attempt to unmute video after load (browser may block it)
+  window.addEventListener("load", function () {
+    const video = document.getElementById("introVideo");
+    video.muted = false;
+    video.play().catch(err => {
+      // Browser blocked autoplay with sound; fallback to muted autoplay
+      console.warn("Autoplay with sound failed. Browser policy may block it.");
+      video.muted = true;
+      video.play();
+    });
+  });
+</script>
+
+</body>
+                                            </html>
