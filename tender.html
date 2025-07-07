@@ -3,72 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Request Tender – KIBSVIC</title>
+  <title>Request Tender – KIBSVIC LIMITED</title>
   <style>
-    body { font-family: Arial; background: #f2f2f2; margin: 0; padding: 0; color: #333; }
-    header, footer { background-color: #2ecc71; color: white; text-align: center; padding: 15px; }
-    .container { max-width: 600px; margin: auto; padding: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+      color: #333;
+    }
+
+    header, footer {
+      background-color: #2ecc71;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2ecc71;
+      margin-bottom: 10px;
+    }
+
     form {
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
     input, textarea, select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      font-size: 15px;
     }
+
     button {
       background: #2ecc71;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
     }
-    button:hover { background: #27ae60; }
+
+    button:hover {
+      background: #27ae60;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      display: inline-block;
+      text-decoration: none;
+      color: #2ecc71;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Request for Construction Tender</h1>
+  <h1>Request a Tender</h1>
 </header>
 
 <div class="container">
-  <form>
-    <label for="org">Organization / Individual Name</label>
-    <input type="text" id="org" required>
+  <p style="text-align:center;">Fill in your project details and we’ll get back to you soon.</p>
+
+  <form action="https://formsubmit.co/your@email.com" method="POST">
+    <!-- Replace with your real email above -->
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_next" value="about:blank">
+
+    <label for="org">Your Name / Organization</label>
+    <input type="text" id="org" name="organization_name" required>
 
     <label for="project">Type of Project</label>
-    <select id="project" required>
+    <select id="project" name="project_type" required>
       <option value="">Select Project Type</option>
-      <option value="bridge">Bridge / Mini-bridge</option>
+      <option value="bridge">Bridge / Mini-Bridge</option>
       <option value="culvert">Box Culvert / Pipe Culvert</option>
       <option value="weir">Weir / Small Dam</option>
       <option value="tank">Water Tank</option>
       <option value="wall">Perimeter Wall</option>
       <option value="gabion">Gabions</option>
+      <option value="other">Other Civil Project</option>
     </select>
 
     <label for="location">Project Location</label>
-    <input type="text" id="location" required>
+    <input type="text" id="location" name="project_location" required>
 
     <label for="details">Project Description</label>
-    <textarea id="details" rows="5" required></textarea>
+    <textarea id="details" name="project_description" rows="5" placeholder="Give a brief about what is to be constructed..." required></textarea>
 
     <label for="phone">Phone Number</label>
-    <input type="tel" id="phone" required>
+    <input type="tel" id="phone" name="phone_number" placeholder="+2547..." required>
 
-    <label for="email">Email (optional)</label>
-    <input type="email" id="email">
+    <label for="email">Email Address (optional)</label>
+    <input type="email" id="email" name="client_email" placeholder="you@example.com">
 
     <button type="submit">Submit Tender Request</button>
   </form>
+
+  <a class="back-link" href="index.html">← Back to Home</a>
 </div>
 
 <footer>
