@@ -1,0 +1,69 @@
+<!-- public/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – KIBSVIC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaf3fa;
+      color: #222;
+      padding: 20px;
+    }
+    h1 {
+      color: #0077cc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>KIBSVIC Tender Submissions</h1>
+  <table id="tenderTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name/Org</th>
+        <th>Project Type</th>
+        <th>Location</th>
+        <th>Description</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    fetch("/admin/data")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#tenderTable tbody");
+        data.slice(1).forEach(row => {
+          const tr = document.createElement("tr");
+          row.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => console.error("Error loading data:", err));
+  </script>
+</body>
+</html>
