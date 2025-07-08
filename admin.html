@@ -1,69 +1,160 @@
-<!-- public/admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel – KIBSVIC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – KIBSVIC LIMITED</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eaf3fa;
-      color: #222;
+      margin: 0;
+      background-color: #e8f0ff;
+      color: #333;
+    }
+
+    header {
+      background-color: #1e3d8f;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
       padding: 20px;
     }
-    h1 {
-      color: #0077cc;
+
+    .login-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 40px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+
+    button {
+      background-color: #1e3d8f;
+      color: white;
+      border: none;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 30px;
     }
+
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #999;
       padding: 10px;
       text-align: left;
     }
+
     th {
-      background-color: #0077cc;
+      background-color: #1e3d8f;
       color: white;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>KIBSVIC Tender Submissions</h1>
-  <table id="tenderTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Name/Org</th>
-        <th>Project Type</th>
-        <th>Location</th>
-        <th>Description</th>
-        <th>Phone</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
-  <script>
-    fetch("/admin/data")
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.querySelector("#tenderTable tbody");
-        data.slice(1).forEach(row => {
-          const tr = document.createElement("tr");
-          row.forEach(cell => {
-            const td = document.createElement("td");
-            td.textContent = cell;
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
+<header>
+  <h1>Admin Panel – Tender Submissions</h1>
+</header>
+
+<div class="container">
+  <div id="login-box" class="login-box">
+    <h3>Admin Login</h3>
+    <input type="tel" id="phone" placeholder="Enter Phone (e.g. 0704956476)" />
+    <input type="password" id="pin" placeholder="Enter PIN (e.g. @Kibsvic)" />
+    <button onclick="verifyLogin()">Login</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <div id="data-section" class="hidden">
+    <h2>Submitted Tenders</h2>
+    <table id="tender-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name / Organization</th>
+          <th>Project Type</th>
+          <th>Location</th>
+          <th>Description</th>
+          <th>Phone</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="tender-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const allowedPhones = ['0704956476', '0796029616'];
+  const correctPIN = '@Kibsvic';
+
+  function verifyLogin() {
+    const phone = document.getElementById("phone").value.trim();
+    const pin = document.getElementById("pin").value.trim();
+    const errorBox = document.getElementById("error");
+
+    if (allowedPhones.includes(phone) && pin === correctPIN) {
+      document.getElementById("login-box").classList.add("hidden");
+      document.getElementById("data-section").classList.remove("hidden");
+      loadSheetData();
+    } else {
+      errorBox.textContent = "Invalid phone or PIN";
+    }
+  }
+
+  async function loadSheetData() {
+    const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ";
+    const apiKey = "YOUR_GOOGLE_API_KEY"; // Replace this
+    const range = "Sheet1!A:G";
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const rows = data.values;
+
+      if (!rows || rows.length < 2) return;
+
+      const tableBody = document.getElementById("tender-body");
+      tableBody.innerHTML = "";
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell || "";
+          tr.appendChild(td);
         });
-      })
-      .catch(err => console.error("Error loading data:", err));
-  </script>
+        tableBody.appendChild(tr);
+      }
+    } catch (err) {
+      alert("Failed to load data. Check API Key and Sharing Settings.");
+      console.error(err);
+    }
+  }
+</script>
+
 </body>
 </html>
