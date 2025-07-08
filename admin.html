@@ -7,46 +7,37 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eaf1ff;
+      background-color: #e6f0ff;
       padding: 20px;
-      color: #222;
+      color: #333;
     }
     h1 {
       color: #1e3d8f;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    th {
+    a.button {
+      display: inline-block;
       background-color: #1e3d8f;
       color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a.button:hover {
+      background-color: #143270;
     }
   </style>
 </head>
 <body>
-  <h1>Submitted Tender Requests</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Name / Organization</th>
-        <th>Project Type</th>
-        <th>Location</th>
-        <th>Description</th>
-        <th>Phone</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody id="tender-data"></tbody>
-  </table>
+  <h1>Admin Panel</h1>
+  <p>Welcome admin! Choose an action:</p>
+  <a class="button" href="page.html">View Tender Submissions</a>
+  <a class="button" href="index.html" style="margin-left: 10px;">← Back to Home</a>
 
-  <script src="script.js"></script>
+  <script>
+    if (localStorage.getItem("admin") !== "true") {
+      window.location.href = "admin-login.html";
+    }
+  </script>
 </body>
 </html>
