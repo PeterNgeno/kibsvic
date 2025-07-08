@@ -2,6 +2,8 @@ const allowedPhones = ['0704956476', '0796029616']; const adminPIN = '@Kibsvic';
 
 function handleLogin() { const phone = document.getElementById("admin-phone").value.trim(); const pin = document.getElementById("admin-pin").value.trim();
 
+console.log("Login button clicked"); // Debug log
+
 if (allowedPhones.includes(phone) && pin === adminPIN) { localStorage.setItem("admin", "true"); window.location.href = "admin.html"; } else { document.getElementById("login-error").textContent = "Invalid phone or PIN."; } }
 
 window.addEventListener("DOMContentLoaded", () => { if (window.location.pathname.includes("admin.html")) { const isAdmin = localStorage.getItem("admin") === "true"; if (!isAdmin) { window.location.href = "admin-login.html"; return; } loadTenderData(); } });
@@ -25,5 +27,5 @@ for (let i = 1; i < rows.length; i++) {
 
 } catch (err) { alert("Failed to load data. Check your Google Sheet or API key."); console.error(err); } }
 
-// Set your API key once in browser: // localStorage.setItem("kibsvic_api_key", "YOUR_GOOGLE_API_KEY");
+// To set your API key securely in the browser, run this in the developer console: // localStorage.setItem("kibsvic_api_key", "YOUR_API_KEY_HERE");
 
