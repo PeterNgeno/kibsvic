@@ -117,7 +117,7 @@ if (allowedPhones.includes(phone) && pin === adminPIN) { localStorage.setItem("a
 
 window.addEventListener("DOMContentLoaded", () => { if (window.location.pathname.includes("admin.html")) { const isAdmin = localStorage.getItem("admin") === "true"; if (!isAdmin) { window.location.href = "admin-login.html"; return; } loadTenderData(); } });
 
-async function loadTenderData() { const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ"; const apiKey = "AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc"; // Your actual API key const range = "Sheet1!A:G";
+async function loadTenderData() { const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ"; const apiKey = localStorage.getItem("kibsvic_api_key"); // avoid exposing in public code if (!apiKey) return alert("Missing API Key."); const range = "Sheet1!A:G";
 
 try { const res = await fetch(https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}); const data = await res.json(); const rows = data.values; if (!rows || rows.length < 2) return;
 
@@ -134,5 +134,7 @@ for (let i = 1; i < rows.length; i++) {
   tbody.appendChild(tr);
 }
 
-} catch (err) { alert("Failed to load data. Check your API key or Google Sheet access."); console.error(err); } }
+} catch (err) { alert("Failed to load data. Check your Google Sheet or API key."); console.error(err); } }
+
+// Set your API key securely in browser before login: // localStorage.setItem("kibsvic_api_key", "YOUR_GOOGLE_API_KEY");
 
