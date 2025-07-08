@@ -166,6 +166,13 @@
   </div>
 </div>
 
+<!-- Admin Checkbox Access -->
+<div style="text-align:center; font-size:12px; margin: 20px 0;">
+  <label>
+    <input type="checkbox" id="adminCheck" /> Admin
+  </label>
+</div>
+
 <footer>
   &copy; 2025 KIBSVIC LIMITED. All Rights Reserved.
 </footer>
@@ -195,6 +202,13 @@
     index = (index + 1) % images.length;
     images[index].classList.add('active');
   }, 4000);
+
+  // Admin checkbox redirect
+  document.getElementById("adminCheck").addEventListener("change", function () {
+    if (this.checked) {
+      window.location.href = "admin-login.html";
+    }
+  });
 </script>
 
 </body>
