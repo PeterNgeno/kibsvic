@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Tender Submissions – KIBSVIC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef4ff;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      color: #1e3d8f;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #1e3d8f;
+      color: white;
+    }
+    .note {
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Submitted Tenders</h1>
+  <p class="note">Only accessible to authorized admins.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name / Organization</th>
+        <th>Project Type</th>
+        <th>Location</th>
+        <th>Description</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody id="tender-data"></tbody>
+  </table>  <script>
+    // Check admin access
+    if (localStorage.getItem("admin") !== "true") {
+      window.location.href = "admin-login.html";
+    }
+
+    // Load from Google Sheet
+    async function loadTenderData() {
+      const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ";
+      const apiKey = localStorage.getItem("kibsvic_api_key");
+      const range = "Sheet1!A:G";
+
+      try {
+        const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`);
+        const data = await res.json();
+        const rows = data.values;
+        const tbody = document.getElementById("tender-data");
+
+        if (!rows || rows.length < 2) return;
+
+        for (let i = 1; i < rows.length; i++) {
+          const tr = document.createElement("tr");
+          rows[i].forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell || "";
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      } catch (err) {
+        console.error("Failed to load data:", err);
+        alert("Could not load sheet data. Check API key or sheet access.");
+      }
+    }
+
+    loadTenderData();
+  </script></body>
+</html>
