@@ -1,79 +1,138 @@
-<!-- public/admin-login.html -->
-<!DOCTYPE html>
-<html lang="en">
+/* --- FILE: admin-login.html --- */
+
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login – KIBSVIC</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - KIBSVIC</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #eaf3fa;
-      padding: 40px;
-      text-align: center;
+      background-color: #e0ecff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    form {
-      background: white;
-      padding: 25px;
-      max-width: 400px;
-      margin: auto;
-      border-radius: 8px;
+    .login-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+      color: #1e3d8f;
     }
     input {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
+      margin-top: 15px;
       border-radius: 5px;
-      font-size: 16px;
+      border: 1px solid #ccc;
+      font-size: 15px;
     }
     button {
-      background: #0077cc;
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #1e3d8f;
       color: white;
       border: none;
-      padding: 12px;
-      width: 100%;
-      font-size: 16px;
       border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
     }
-    .error {
+    #login-error {
       color: red;
+      font-size: 14px;
       margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h2>Admin Access</h2>
-  <form id="loginForm">
-    <input type="tel" name="phone" placeholder="Phone (e.g. 0704956476)" required>
-    <input type="password" name="pin" placeholder="PIN (e.g. @Kibsvic)" required>
-    <button type="submit">Login</button>
-    <div class="error" id="errorMsg"></div>
-  </form>
+  <div class="login-box">
+    <h2>Admin Login</h2>
+    <input type="tel" id="admin-phone" placeholder="Phone Number">
+    <input type="password" id="admin-pin" placeholder="PIN">
+    <button onclick="handleLogin()">Login</button>
+    <div id="login-error"></div>
+  </div>  <script src="script.js"></script></body>
+</html>/* --- FILE: admin.html --- */
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const data = {
-        phone: form.phone.value.trim(),
-        pin: form.pin.value.trim()
-      };
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - KIBSVIC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaf1ff;
+      padding: 20px;
+      color: #222;
+    }
+    h1 {
+      color: #1e3d8f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #1e3d8f;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Submitted Tender Requests</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name / Organization</th>
+        <th>Project Type</th>
+        <th>Location</th>
+        <th>Description</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody id="tender-data"></tbody>
+  </table>  <script src="script.js"></script></body>
+</html>/* --- FILE: script.js --- */ const allowedPhones = ['0704956476', '0796029616']; const adminPIN = '@Kibsvic';
 
-      const res = await fetch("/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      if (result.success) {
-        window.location.href = "/admin";
-      } else {
-        document.getElementById("errorMsg").textContent = "Invalid phone or PIN.";
-      }
-    });
-  </script>
-</body>
-</html>
+function handleLogin() { const phone = document.getElementById("admin-phone").value.trim(); const pin = document.getElementById("admin-pin").value.trim();
+
+if (allowedPhones.includes(phone) && pin === adminPIN) { localStorage.setItem("admin", "true"); window.location.href = "admin.html"; } else { document.getElementById("login-error").textContent = "Invalid phone or PIN."; } }
+
+window.addEventListener("DOMContentLoaded", () => { if (window.location.pathname.includes("admin.html")) { const isAdmin = localStorage.getItem("admin") === "true"; if (!isAdmin) { window.location.href = "admin-login.html"; return; } loadTenderData(); } });
+
+async function loadTenderData() { const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ"; const apiKey = "AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc"; // Your actual API key const range = "Sheet1!A:G";
+
+try { const res = await fetch(https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}); const data = await res.json(); const rows = data.values; if (!rows || rows.length < 2) return;
+
+const tbody = document.getElementById("tender-data");
+tbody.innerHTML = "";
+for (let i = 1; i < rows.length; i++) {
+  const row = rows[i];
+  const tr = document.createElement("tr");
+  row.forEach(cell => {
+    const td = document.createElement("td");
+    td.textContent = cell || "";
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+}
+
+} catch (err) { alert("Failed to load data. Check your API key or Google Sheet access."); console.error(err); } }
+
