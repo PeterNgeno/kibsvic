@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Created Pages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>All Pages</h2>
+  <div id="pageList"></div>
+
+  <script>
+    const sheetID = "1wzVfCTFpOSGRSHVWbtu9EybizYcO5zBNATiDK2SCu_Q";
+    const sheetName = "pages";
+
+    async function fetchSheetData() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const rows = data.values;
+      const container = document.getElementById("pageList");
+
+      for (let i = 1; i < rows.length; i++) {
+        const [timestamp, title] = rows[i];
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><strong>${title}</strong> (${timestamp})</p>
+          <a href="viewer.html?id=${i}">View Page</a>
+          <hr>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    fetchSheetData();
+  </script>
+</body>
+</html>
