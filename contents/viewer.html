@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Page</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .watermark {
+      display: none;
+    }
+
+    @media print {
+      .watermark {
+        display: block;
+        position: fixed;
+        bottom: 10%;
+        left: 50%;
+        transform: translateX(-50%) rotate(-20deg);
+        font-size: 32px;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.15); /* semi-transparent black */
+        text-shadow: 1px 1px 2px black;
+        z-index: 9999;
+        pointer-events: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="pageDisplay"></div>
+
+  <div class="watermark">www.kibsvic.co.ke</div>
+
+  <script>
+    const sheetID = "1wzVfCTFpOSGRSHVWbtu9EybizYcO5zBNATiDK2SCu_Q";
+    const sheetName = "pages";
+    const apiKey = "AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const rowId = parseInt(urlParams.get("id"));
+
+    async function showPage() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const rows = data.values;
+
+      if (rowId >= rows.length) {
+        document.getElementById("pageDisplay").innerText = "Page not found.";
+        return;
+      }
+
+      const [timestamp, title, desc, font, color, bgColor, anim, image, video] = rows[rowId];
+      const displayDiv = document.getElementById("pageDisplay");
+
+      displayDiv.style.fontFamily = font;
+      displayDiv.style.color = color;
+      displayDiv.style.backgroundColor = bgColor;
+      displayDiv.className = anim;
+
+      let imgEmbed = "";
+      if (image && image.includes("http")) {
+        imgEmbed = `<img src="${image}" alt="Image" style="max-width:100%;height:auto;margin-top:10px;">`;
+      }
+
+      let videoEmbed = "";
+      if (video) {
+        if (video.includes("youtube.com") || video.includes("youtu.be")) {
+          const ytID = video.split("v=")[1] || video.split("/").pop();
+          videoEmbed = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${ytID}" frameborder="0" allowfullscreen></iframe>`;
+        } else if (video.includes("drive.google.com")) {
+          const fileId = video.match(/[-\\w]{25,}/);
+          if (fileId) {
+            videoEmbed = `<iframe src="https://drive.google.com/file/d/${fileId[0]}/preview" width="100%" height="315" allow="autoplay"></iframe>`;
+          }
+        }
+      }
+
+      displayDiv.innerHTML = `
+        <h2>${title}</h2>
+        <p>${desc}</p>
+        ${imgEmbed}
+        ${videoEmbed}
+        <p><small>Posted: ${timestamp}</small></p>
+      `;
+    }
+
+    showPage();
+  </script>
+</body>
+</html>
