@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Your Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Customize Your Page</h2>
+
+  <label>Title: <input type="text" id="titleInput"></label><br>
+  <label>Description:<br>
+    <textarea id="descInput" rows="4" cols="50"></textarea>
+  </label><br>
+
+  <label>Choose Font:
+    <select id="fontSelect">
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+    </select>
+  </label><br>
+
+  <label>Text Color: <input type="color" id="textColorInput"></label><br>
+  <label>Background Color: <input type="color" id="bgColorInput"></label><br>
+
+  <label>Animation:
+    <select id="animationSelect">
+      <option value="none">None</option>
+      <option value="fadeIn">Fade In</option>
+      <option value="slideIn">Slide In</option>
+    </select>
+  </label><br>
+
+  <label>Paste Image Link: <input type="url" id="imgLinkInput" placeholder="e.g. https://drive.google.com/..."></label><br>
+  <label>Paste Video/YouTube Link: <input type="url" id="videoLinkInput" placeholder="e.g. https://youtu.be/..."></label><br>
+
+  <button onclick="savePage()">Save Page</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
