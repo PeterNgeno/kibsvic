@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>All Tender Submissions – KIBSVIC</title>
   <style>
     body {
@@ -33,11 +33,30 @@
       font-size: 14px;
       color: #888;
     }
+
+    input[type="checkbox"] {
+      accent-color: #1e3d8f;
+      width: 18px;
+      height: 18px;
+    }
+
+    button {
+      background-color: #1e3d8f;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1540a0;
+    }
   </style>
 </head>
 <body>
   <h1>All Submitted Tenders</h1>
   <p class="note">Only accessible to authorized admins.</p>
+
   <table>
     <thead>
       <tr>
@@ -53,17 +72,28 @@
     <tbody id="tender-data"></tbody>
   </table>
 
+  <!-- ✅ Checkbox toggle and editor button -->
+  <label style="display: flex; align-items: center; gap: 6px; margin-top: 30px;">
+    <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
+    <span>Show Page Creator</span>
+  </label>
+
+  <div id="editorPanel" style="display: none; margin-top: 10px;">
+    <button onclick="window.location.href='contents/editor.html'">Open Page Editor</button>
+  </div>
+
+  <!-- ✅ JavaScript goes below -->
   <script>
-    // Check admin access
+    // ✅ Check admin login
     if (localStorage.getItem("admin") !== "true") {
       window.location.href = "admin-login.html";
     }
 
-    // Load from Google Sheet
+    // ✅ Load sheet data
     async function loadTenderData() {
       const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ";
       const apiKey = "AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc";
-      const range = "TENDER APPLICATION!A:G"; // updated sheet name
+      const range = "TENDER APPLICATION!A:G";
 
       try {
         const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`);
@@ -96,15 +126,15 @@
       }
     }
 
-    loadTenderData();
-    <label style="display: flex; align-items: center; gap: 6px; margin-top: 20px;">
-  <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
-  <span>Show Page Creator</span>
-</label>
+    // ✅ Editor checkbox toggle
+    function toggleEditor() {
+      const panel = document.getElementById("editorPanel");
+      const checked = document.getElementById("editorToggle").checked;
+      panel.style.display = checked ? "block" : "none";
+    }
 
-<div id="editorPanel" style="display: none; margin-top: 15px;">
-  <button onclick="window.location.href='admih.html'">Open Page Editor</button>
-</div>
+    // ✅ Call function
+    loadTenderData();
   </script>
 </body>
 </html>
