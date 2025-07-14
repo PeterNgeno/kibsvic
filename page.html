@@ -97,6 +97,14 @@
     }
 
     loadTenderData();
+    <label style="display: flex; align-items: center; gap: 6px; margin-top: 20px;">
+  <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
+  <span>Show Page Creator</span>
+</label>
+
+<div id="editorPanel" style="display: none; margin-top: 15px;">
+  <button onclick="window.location.href='admih.html'">Open Page Editor</button>
+</div>
   </script>
 </body>
 </html>
