@@ -5,40 +5,45 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Customize Your Page</h2><label>Title: <input type="text" id="titleInput"></label><br> <label>Description:<br> <textarea id="descInput" rows="4" cols="50"></textarea> </label><br>
+  <h2>Customize Your Page</h2>  <form id="pageForm" enctype="multipart/form-data">
+    <label>Title: <input type="text" name="title"></label><br>
+    <label>Description:<br>
+      <textarea name="desc" rows="4" cols="50"></textarea>
+    </label><br><label>Choose Font:
+  <select name="font">
+    <option value="Arial">Arial</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Courier New">Courier New</option>
+  </select>
+</label><br>
 
-<label>Choose Font: <select id="fontSelect"> <option value="Arial">Arial</option> <option value="Georgia">Georgia</option> <option value="Courier New">Courier New</option> </select> </label><br>
+<label>Text Color: <input type="color" name="color"></label><br>
+<label>Background Color: <input type="color" name="bgColor"></label><br>
 
-<label>Text Color: <input type="color" id="textColorInput"></label><br> <label>Background Color: <input type="color" id="bgColorInput"></label><br>
+<label>Animation:
+  <select name="anim">
+    <option value="none">None</option>
+    <option value="fadeIn">Fade In</option>
+    <option value="slideIn">Slide In</option>
+  </select>
+</label><br><br>
 
-<label>Animation: <select id="animationSelect"> <option value="none">None</option> <option value="fadeIn">Fade In</option> <option value="slideIn">Slide In</option> </select> </label><br><br>
+<label>Upload Image:
+  <input type="file" name="image" accept="image/*">
+</label><br><br>
 
-  <!-- ✅ Image Upload --><label>Upload Image: <input type="file" id="imageUploader" accept="image/*"> </label><br><br>
+<label>Paste Video/YouTube Link:
+  <input type="url" name="video" placeholder="e.g. https://youtu.be/...">
+</label><br><br>
 
-<label>Paste Video/YouTube Link: <input type="url" id="videoLinkInput" placeholder="e.g. https://youtu.be/..."> </label><br><br>
+<button type="submit">Save Page</button>
 
-<button onclick="savePage()">Save Page</button>
+  </form>  <script>
+    document.getElementById('pageForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-  <script>
-    async function savePage() {
-      const title = document.getElementById("titleInput").value;
-      const desc = document.getElementById("descInput").value;
-      const font = document.getElementById("fontSelect").value;
-      const color = document.getElementById("textColorInput").value;
-      const bgColor = document.getElementById("bgColorInput").value;
-      const anim = document.getElementById("animationSelect").value;
-      const video = document.getElementById("videoLinkInput").value;
-      const imageFile = document.getElementById("imageUploader").files[0];
-
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("desc", desc);
-      formData.append("font", font);
-      formData.append("color", color);
-      formData.append("bgColor", bgColor);
-      formData.append("anim", anim);
-      formData.append("video", video);
-      if (imageFile) formData.append("image", imageFile);
+      const form = e.target;
+      const formData = new FormData(form);
 
       try {
         const response = await fetch("https://script.google.com/macros/s/AKfycbzHtDFVJ-z_PQe_HW42ajylGGsFFhDrF23bd9Q8BdOKrQCieA4H9_RGaDRDKrzpO_pt/exec", {
@@ -47,12 +52,12 @@
         });
 
         const result = await response.text();
-        alert("Server Response: " + result);
-        window.location.reload();
-      } catch (error) {
-        console.error("Unexpected error:", error);
+        alert(result);
+        form.reset();
+      } catch (err) {
         alert("Unexpected error occurred. Check console.");
+        console.error(err);
       }
-    }
+    });
   </script></body>
 </html>
