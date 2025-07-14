@@ -41,7 +41,6 @@
     </select>
   </label><br><br>
 
-  <!-- ✅ Paste or Upload Image -->
   <label>Paste Image Link: <input type="url" id="imgLinkInput" placeholder="e.g. https://drive.google.com/..."></label><br>
   <label>Or Upload Image:
     <input type="file" accept="image/*" id="imageUploader" onchange="previewImage(event)">
@@ -55,7 +54,6 @@
   <button onclick="savePage()">Save Page</button>
 
   <script>
-    // Load uploaded image preview
     function previewImage(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -65,12 +63,11 @@
         const dataUrl = e.target.result;
         document.getElementById("imagePreview").src = dataUrl;
         document.getElementById("imagePreview").style.display = "block";
-        document.getElementById("imgLinkInput").value = dataUrl; // auto-fill base64 image
+        document.getElementById("imgLinkInput").value = dataUrl;
       };
       reader.readAsDataURL(file);
     }
 
-    // Save to Google Sheet
     async function savePage() {
       const title = document.getElementById("titleInput").value;
       const desc = document.getElementById("descInput").value;
@@ -89,7 +86,7 @@
 
       try {
         const response = await fetch(
-          "https://sheets.googleapis.com/v4/spreadsheets/1wzVfCTFpOSGRSHVWbtu9EybizYcO5zBNATiDK2SCu_Q/values/pages:append?valueInputOption=USER_ENTERED&key=AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc",
+          "https://sheets.googleapis.com/v4/spreadsheets/1wxKcMGMrxSIsiqOWaqKlHAwKj_qaNP3HxSBpu67hKHA/values/pages:append?valueInputOption=USER_ENTERED&key=AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc",
           {
             method: "POST",
             body: JSON.stringify(data),
@@ -103,6 +100,8 @@
           alert("Page saved successfully!");
           window.location.reload();
         } else {
+          const error = await response.json();
+          console.error("Save error:", error);
           alert("Failed to save. Please check your sheet permissions or API key.");
         }
       } catch (error) {
