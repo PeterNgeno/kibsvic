@@ -82,6 +82,16 @@
     <button onclick="window.location.href='contents/editor.html'">Open Page Editor</button>
   </div>
 
+    <!-- ✅ Checkbox toggle and editor button -->
+  <label style="display: flex; align-items: center; gap: 6px; margin-top: 30px;">
+    <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
+    <span>Show Page Creator</span>
+  </label>
+
+  <div id="editorPanel" style="display: none; margin-top: 10px;">
+    <button onclick="window.location.href='contents/table.html'">Open Page Editor</button>
+  </div>
+
   <!-- ✅ JavaScript goes below -->
   <script>
     // ✅ Check admin login
