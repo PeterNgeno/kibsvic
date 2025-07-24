@@ -1,59 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Worker Record System</title>
+  <meta charset="UTF-8">
+  <title>Narok County Payment Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; }
-    table { border-collapse: collapse; width: 100%; background-color: #e3f2fd; }
-    th, td { border: 1px solid #90caf9; padding: 8px; text-align: center; }
-    th { background-color: #42a5f5; color: white; }
-    input, select { padding: 6px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
   </style>
 </head>
 <body>
-  <h2>Worker Entry</h2>
-  <form id="workerForm">
-    Name: <input type="text" id="name" required><br><br>
-    ID Number: <input type="text" id="id" required><br><br>
-    Rate: <input type="number" id="rate" required><br><br>
-    Date: <input type="date" id="date" required><br><br>
-    Day: <input type="text" id="day" required><br><br>
-    Paid: <select id="paid">
-      <option value="false">Not Paid</option>
-      <option value="true">Paid</option>
-    </select><br><br>
-    Paid Amount: <input type="number" id="paidAmount"><br><br>
-    <button type="submit">Submit</button>
-  </form>
 
-  <script>
-    document.getElementById("workerForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+<div class="container">
+  <h2>Narok County Payment Form</h2>
+  
+  <label for="name">Name:</label>
+  <input id="name" type="text" placeholder="Enter Name" required>
 
-      const data = {
-        name: document.getElementById("name").value,
-        id: document.getElementById("id").value,
-        rate: Number(document.getElementById("rate").value),
-        date: document.getElementById("date").value,
-        day: document.getElementById("day").value,
-        paid: document.getElementById("paid").value === "true",
-        paidAmount: Number(document.getElementById("paidAmount").value || 0),
-      };
+  <label for="id">ID Number:</label>
+  <input id="id" type="text" placeholder="Enter ID Number" required>
 
-      fetch("https://script.google.com/macros/s/AKfycbwWaphufKa3hEKz_uAsgh6moGutGvbmHIBLkHo-eest_Eb1teF1DPT0IhI_LH79SQqMfw/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
+  <label for="rate">Rate (KES):</label>
+  <input id="rate" type="number" placeholder="Enter Rate" required>
+
+  <label for="date">Date:</label>
+  <input id="date" type="date" required>
+
+  <label for="day">Day:</label>
+  <input id="day" type="text" placeholder="Enter Day" required>
+
+  <label>
+    <input id="paid" type="checkbox">
+    Paid?
+  </label>
+
+  <label for="paidAmount">Paid Amount (KES):</label>
+  <input id="paidAmount" type="number" placeholder="Enter Paid Amount">
+
+  <button onclick="submitData()">Save</button>
+</div>
+
+<script>
+  function submitData() {
+    const name = document.getElementById("name").value.trim();
+    const id = document.getElementById("id").value.trim();
+    const rate = parseFloat(document.getElementById("rate").value);
+    const date = document.getElementById("date").value;
+    const day = document.getElementById("day").value.trim();
+    const paid = document.getElementById("paid").checked;
+    const paidAmount = parseFloat(document.getElementById("paidAmount").value) || 0;
+
+    if (!name || !id || isNaN(rate) || !date || !day) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbwWaphufKa3hEKz_uAsgh6moGutGvbmHIBLkHo-eest_Eb1teF1DPT0IhI_LH79SQqMfw/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        id,
+        rate,
+        date,
+        day,
+        paid,
+        paidAmount
       })
-      .then(res => res.text())
-      .then(response => {
-        alert("Submitted: " + response);
-        document.getElementById("workerForm").reset();
-      })
-      .catch(err => alert("Error: " + err));
+    })
+    .then(response => response.text())
+    .then(text => {
+      alert("✅ Saved Successfully: " + text);
+      // Optionally clear form after submission
+      document.getElementById("name").value = "";
+      document.getElementById("id").value = "";
+      document.getElementById("rate").value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("day").value = "";
+      document.getElementById("paid").checked = false;
+      document.getElementById("paidAmount").value = "";
+    })
+    .catch(error => {
+      alert("❌ Failed to save data: " + error);
     });
-  </script>
+  }
+</script>
+
 </body>
 </html>
