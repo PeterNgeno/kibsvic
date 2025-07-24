@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Worker Record System</title>
+  <style>
+    body { font-family: Arial; }
+    table { border-collapse: collapse; width: 100%; background-color: #e3f2fd; }
+    th, td { border: 1px solid #90caf9; padding: 8px; text-align: center; }
+    th { background-color: #42a5f5; color: white; }
+    input, select { padding: 6px; }
+  </style>
+</head>
+<body>
+  <h2>Worker Entry</h2>
+  <form id="workerForm">
+    Name: <input type="text" id="name" required><br><br>
+    ID Number: <input type="text" id="id" required><br><br>
+    Rate: <input type="number" id="rate" required><br><br>
+    Date: <input type="date" id="date" required><br><br>
+    Day: <input type="text" id="day" required><br><br>
+    Paid: <select id="paid">
+      <option value="false">Not Paid</option>
+      <option value="true">Paid</option>
+    </select><br><br>
+    Paid Amount: <input type="number" id="paidAmount"><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById("workerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        name: document.getElementById("name").value,
+        id: document.getElementById("id").value,
+        rate: Number(document.getElementById("rate").value),
+        date: document.getElementById("date").value,
+        day: document.getElementById("day").value,
+        paid: document.getElementById("paid").value === "true",
+        paidAmount: Number(document.getElementById("paidAmount").value || 0),
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwWaphufKa3hEKz_uAsgh6moGutGvbmHIBLkHo-eest_Eb1teF1DPT0IhI_LH79SQqMfw/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.text())
+      .then(response => {
+        alert("Submitted: " + response);
+        document.getElementById("workerForm").reset();
+      })
+      .catch(err => alert("Error: " + err));
+    });
+  </script>
+</body>
+</html>
