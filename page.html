@@ -33,13 +33,11 @@
       font-size: 14px;
       color: #888;
     }
-
     input[type="checkbox"] {
       accent-color: #1e3d8f;
       width: 18px;
       height: 18px;
     }
-
     button {
       background-color: #1e3d8f;
       color: white;
@@ -72,34 +70,33 @@
     <tbody id="tender-data"></tbody>
   </table>
 
-  <!-- ✅ Checkbox toggle and editor button -->
+  <!-- ✅ Checkbox for editor.html -->
   <label style="display: flex; align-items: center; gap: 6px; margin-top: 30px;">
-    <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
-    <span>Show Page Creator</span>
+    <input type="checkbox" id="editorCheckbox" onclick="toggleEditorPanel()" />
+    <span>Show Page Creator (Editor)</span>
   </label>
 
   <div id="editorPanel" style="display: none; margin-top: 10px;">
     <button onclick="window.location.href='contents/editor.html'">Open Page Editor</button>
   </div>
 
-    <!-- ✅ Checkbox toggle and editor button -->
-  <label style="display: flex; align-items: center; gap: 6px; margin-top: 30px;">
-    <input type="checkbox" id="editorToggle" onclick="toggleEditor()" />
-    <span>Show Page Creator</span>
+  <!-- ✅ Checkbox for table.html -->
+  <label style="display: flex; align-items: center; gap: 6px; margin-top: 20px;">
+    <input type="checkbox" id="tableCheckbox" onclick="toggleTablePanel()" />
+    <span>Show Page Creator (Table)</span>
   </label>
 
   <div id="tablePanel" style="display: none; margin-top: 10px;">
-    <button onclick="window.location.href='contents/table.html'">Open Page Editor</button>
+    <button onclick="window.location.href='contents/table.html'">Open Table Editor</button>
   </div>
 
-  <!-- ✅ JavaScript goes below -->
   <script>
-    // ✅ Check admin login
+    // ✅ Redirect if not admin
     if (localStorage.getItem("admin") !== "true") {
       window.location.href = "admin-login.html";
     }
 
-    // ✅ Load sheet data
+    // ✅ Load Google Sheet data
     async function loadTenderData() {
       const sheetID = "1n9KojLvreFgSmY_1jFw43ibqjYw4xmJ2UcfUSuHqfDQ";
       const apiKey = "AIzaSyDtgJrmygEsN6xkvw5UHSwjizgH9Ii_eSc";
@@ -136,14 +133,21 @@
       }
     }
 
-    // ✅ Editor checkbox toggle
-    function toggleEditor() {
+    // ✅ Toggle for editor.html
+    function toggleEditorPanel() {
       const panel = document.getElementById("editorPanel");
-      const checked = document.getElementById("editorToggle").checked;
+      const checked = document.getElementById("editorCheckbox").checked;
       panel.style.display = checked ? "block" : "none";
     }
 
-    // ✅ Call function
+    // ✅ Toggle for table.html
+    function toggleTablePanel() {
+      const panel = document.getElementById("tablePanel");
+      const checked = document.getElementById("tableCheckbox").checked;
+      panel.style.display = checked ? "block" : "none";
+    }
+
+    // ✅ Initial data load
     loadTenderData();
   </script>
 </body>
