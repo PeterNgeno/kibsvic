@@ -1,3 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KIBSVIC LIMITED</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="KIBSVIC LIMITED is a leading construction company in Kenya, specializing in bridges, culverts, water tanks, gabions, perimeter walls, and civil works.">
+  <meta name="keywords" content="KIBSVIC, Kenya tenders, bridge construction, culverts, gabions, civil projects, infrastructure development, water tanks, perimeter walls, tender submission, KIBSVIC LIMITED construction company">
+  <meta name="author" content="KIBSVIC LIMITED">
+
+  <!-- Open Graph for Facebook & LinkedIn -->
+  <meta property="og:title" content="KIBSVIC LIMITED – Kenya's Trusted Construction Partner">
+  <meta property="og:description" content="Specializing in civil engineering works including bridges, culverts, tanks, gabions, and more.">
+  <meta property="og:image" content="https://www.kibsvic.co.ke/IMG-20250707-WA0008.jpg">
+  <meta property="og:url" content="https://www.kibsvic.co.ke">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="KIBSVIC LIMITED – Kenya's Trusted Construction Partner">
+  <meta name="twitter:description" content="Submit a tender or explore recent infrastructure projects.">
+  <meta name="twitter:image" content="https://www.kibsvic.co.ke/IMG-20250707-WA0008.jpg">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #2ecc71;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .menu-icon {
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      display: none;
+      flex-direction: column;
+      background-color: #2ecc71;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .dropdown a {
+      color: white;
+      padding: 12px;
+      text-decoration: none;
+      border-bottom: 1px solid #27ae60;
+    }
+
+    .dropdown a:hover {
+      background-color: #27ae60;
+    }
+
+    .slideshow {
+      width: 100%;
+      max-height: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slideshow img {
+      width: 100%;
+      display: none;
+      height: auto;
+    }
+
+    .slideshow img.active {
+      display: block;
+    }
+
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      text-decoration: none;
+    }
+
+    .button:hover {
+      background-color: #27ae60;
+    }
+
+    .note {
+      background-color: #222;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+
+    .note h3 {
+      color: gold;
+      margin-top: 0;
+    }
+
+    footer {
+      background-color: #2ecc71;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .logo {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">KIBSVIC LIMITED</div>
+  <div class="menu-icon" onclick="toggleDropdown()">☰</div>
+  <div class="dropdown" id="dropdown-menu">
+    <a href="index.html">Home</a>
+    <a href="recent.html">Recent Constructions</a>
+    <a href="previous.html">Previous Constructions</a>
+    <a href="others.html">Other Projects</a>
+    <a href="house.html">Past Houses Constructed by KIBSVIC Limited</a>
+    <a href="tender.html">Tender</a>
+    <a href="about.html">About</a>
+    <a href="tender.html">Contact Us</a>
+    <a href="terms.html">Terms & Conditions</a>
+    <a href="privacy.html">Privacy Policy</a>
+  </div>
+</header>
+
+<!-- Slideshow -->
+<div class="slideshow" id="slideshow">
+  <img src="IMG-20250707-WA0008.jpg" class="active" alt="Bridge construction">
+  <img src="IMG-20250707-WA0008.jpg" alt="Culvert construction">
+  <img src="IMG-20250707-WA0008.jpg" alt="Water tank construction">
+  <img src="IMG-20250707-WA0008.jpg" alt="Perimeter wall project">
+</div>
+
+<div class="container">
+  <h1>Welcome to KIBSVIC LIMITED</h1>
+  <p>Your Trusted Partner in Infrastructure Development</p>
+
+  <!-- Navigation buttons -->
+  <a href="recent.html" class="button">Recent Constructions</a>
+  <a href="previous.html" class="button">Previous Constructions</a>
+  <a href="others.html" class="button">Other Projects</a>
+  <a href="house.html" class="button">Past Houses Constructed by KIBSVIC Limited</a>
+
+  <!-- Monetization note section -->
+  <div class="note">
+    <h3>Now Open for Tenders</h3>
+    <p>
+      We specialize in bridges, culverts, weirs, water tanks, perimeter walls, and gabions.<br>
+      <strong>House constructions not included.</strong>
+    </p>
+    <p style="font-size: 12px;"> ads</p>
+  </div>
+</div>
+
+<!-- Admin Checkbox Access -->
+<div style="text-align:center; font-size:12px; margin: 20px 0;">
+  <label>
+    <input type="checkbox" id="adminCheck" /> .
+  </label>
+</div>
+
 <footer>
   &copy; 2025 KIBSVIC LIMITED. All Rights Reserved.
 </footer>
