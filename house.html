@@ -1,183 +1,49 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>House — Imgur Gallery</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Past Houses Constructed by KIBSVIC Limited</title>
   <style>
-    /* Page: white content with green margins */
-    :root {
-      --green: #1faa59; /* tweak if you prefer a darker green */
-      --radius: 18px;
-      --shadow: 0 10px 30px rgba(0,0,0,.08);
-    }
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: var(--green);
-    }
     body {
-      display: grid;
-      place-items: start center;
-      padding: 28px; /* this creates the green margins */
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    }
-    .page {
-      width: min(1200px, 100%);
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    header {
-      padding: 20px 22px;
-      border-bottom: 1px solid #eee;
-    }
-    header h1 {
+      background-color: #e0f5e0;
       margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: .3px;
+      font-family: Arial, sans-serif;
     }
-    .hint {
-      margin: 6px 0 0;
-      color: #667085;
-      font-size: 13.5px;
+    .container {
+      background-color: #fff;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
     }
-    .grid {
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 14px;
-      padding: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
     }
-    figure {
-      margin: 0;
-      background: #f7f7f7;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid #eee;
-      transition: transform .08s ease-out, box-shadow .08s ease-out;
-    }
-    figure:focus-within, figure:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0,0,0,.08);
-    }
-    img {
-      display: block;
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      background: #eaeaea;
-    }
-    figcaption {
-      padding: 10px 12px;
-      font-size: 13px;
-      color: #344054;
-    }
-    /* Simple lightbox using <dialog> (native, no libs) */
-    dialog#lightbox {
-      width: min(96vw, 1200px);
-      border: none;
-      padding: 0;
-      background: transparent;
-    }
-    dialog::backdrop {
-      background: rgba(0,0,0,.6);
-    }
-    .lightbox-inner {
-      background: #000;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .lightbox-inner img {
+    .gallery img {
       width: 100%;
       height: auto;
-      max-height: 86vh;
-      object-fit: contain;
-    }
-    .bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      background: #111;
-      color: #fff;
-      font-size: 13px;
-    }
-    .bar button {
-      border: 0;
-      background: #16a34a;
-      color: #fff;
       border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <main class="page" id="app">
-    <header>
-      <h1>House — Imgur Gallery</h1>
-      <p class="hint">Page is white; surrounding margins are green. Paste your Imgur links below and they will appear in the grid. Supports jpg/png/gif.</p>
-    </header>
-    <section class="grid" id="grid"></section>
-  </main>  <dialog id="lightbox">
-    <div class="lightbox-inner">
-      <img id="lightboxImg" alt="Preview" />
-      <div class="bar">
-        <span id="lightboxCaption"></span>
-        <button onclick="document.getElementById('lightbox').close()">Close</button>
-      </div>
+  <div class="container">
+    <h1>Past Houses Constructed by KIBSVIC Limited</h1>
+    <div class="gallery">
+      <img src="https://i.imgur.com/prQDnon.jpg" alt="House 1">
+      <img src="https://i.imgur.com/32xmkMe.jpg" alt="House 2">
+      <img src="https://i.imgur.com/L87o95y.jpg" alt="House 3">
+      <img src="https://i.imgur.com/qspn574.jpg" alt="House 4">
+      <img src="https://i.imgur.com/KrhB7XQ.jpg" alt="House 5">
+      <img src="https://i.imgur.com/rVs2VNK.jpg" alt="House 6">
+      <img src="https://i.imgur.com/DvQDkZ8.jpg" alt="House 7">
     </div>
-  </dialog>  <script>
-    /**
-     * 👉 Replace the sample links below with your actual Imgur links.
-     * You can paste either full URLs like
-     *   https://i.imgur.com/abcd123.jpg
-     * or just the ID, e.g. "abcd123" (we'll assume .jpg).
-     */
-    const IMGUR_LINKS = [
-      // Example placeholders (remove these and paste yours)
-      "https://i.imgur.com/yoKz2wO.jpeg",
-      "https://i.imgur.com/9p7cQ1U.jpeg",
-      // "abcd123", "efgh456.png", ...
-    ];
-
-    function toUrl(item){
-      if(/^https?:\/\//i.test(item)) return item;
-      const id = String(item).replace(/\.(jpg|jpeg|png|gif|webp)$/i, '');
-      return `https://i.imgur.com/${id}.jpg`;
-    }
-
-    const grid = document.getElementById('grid');
-
-    const items = IMGUR_LINKS.map((raw, idx) => ({
-      url: toUrl(raw),
-      caption: typeof raw === 'string' ? raw.split('/').pop() : `Image ${idx+1}`
-    }));
-
-    for (const it of items){
-      const fig = document.createElement('figure');
-      const img = document.createElement('img');
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.src = it.url;
-      img.alt = it.caption;
-      img.addEventListener('click', () => openLightbox(it.url, it.caption));
-      const cap = document.createElement('figcaption');
-      cap.textContent = it.caption;
-      fig.appendChild(img);
-      fig.appendChild(cap);
-      grid.appendChild(fig);
-    }
-
-    function openLightbox(src, caption){
-      const dlg = document.getElementById('lightbox');
-      const im = document.getElementById('lightboxImg');
-      const cap = document.getElementById('lightboxCaption');
-      im.src = src;
-      cap.textContent = caption || '';
-      if (!dlg.open) dlg.showModal();
-    }
-  </script></body>
-</html>
+  </div>
+</body>
+        </html>
