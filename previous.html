@@ -15,6 +15,7 @@
       margin-bottom: 20px;
       padding: 15px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      position: relative;
     }
     .project img {
       width: 100%;
@@ -26,16 +27,29 @@
     .project h2, .project p {
       margin: 10px 0 5px;
     }
-    .back {
-      margin-top: 20px;
-      display: inline-block;
-      background: #2ecc71;
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e74c3c;
       color: white;
-      padding: 10px 20px;
+      border: none;
+      padding: 5px 8px;
       border-radius: 5px;
-      text-decoration: none;
+      cursor: pointer;
     }
-    .back:hover { background: #27ae60; }
+    .delete-btn:hover { background: #c0392b; }
+    .toolbar {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .toolbar select, .toolbar input, .toolbar button {
+      margin: 5px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
     .add-btn, .save-btn {
       display: block;
       background: #27ae60;
@@ -47,6 +61,16 @@
       margin-top: 20px;
     }
     .add-btn:hover, .save-btn:hover { background: #219150; }
+    .back {
+      margin-top: 20px;
+      display: inline-block;
+      background: #2ecc71;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .back:hover { background: #27ae60; }
   </style>
 </head>
 <body>
@@ -54,6 +78,20 @@
 <header>
   <h1 contenteditable="true">Recent Projects – KIBSVIC LIMITED</h1>
 </header>
+
+<div class="toolbar">
+  <select id="fontSelect">
+    <option value="Arial">Arial</option>
+    <option value="Verdana">Verdana</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Times New Roman">Times New Roman</option>
+    <option value="Courier New">Courier New</option>
+  </select>
+  <input type="color" id="colorPicker" title="Change text color">
+  <button onclick="applyFont()">Apply Font</button>
+  <button onclick="applyColor()">Apply Color</button>
+  <button onclick="createLink()">Create Link</button>
+</div>
 
 <div class="container" id="projectContainer"></div>
 
@@ -69,9 +107,8 @@
 
 <script>
   let db;
-  const request = indexedDB.open("KIBSVIC_DB", 3);
+  const request = indexedDB.open("KIBSVIC_DB", 4);
 
-  // Setup database
   request.onupgradeneeded = e => {
     db = e.target.result;
     if (!db.objectStoreNames.contains("projects")) {
@@ -81,16 +118,20 @@
 
   request.onsuccess = e => {
     db = e.target.result;
-    loadProjects(); // load immediately
+    loadProjects();
   };
 
   request.onerror = e => console.error("DB error:", e.target.error);
 
-  // Add new project
   function addProject() {
     const container = document.getElementById("projectContainer");
     const div = document.createElement("div");
     div.className = "project";
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "delete-btn";
+    delBtn.innerText = "✖";
+    delBtn.onclick = () => { div.remove(); saveProjects(); };
 
     const img = document.createElement("img");
     img.src = "placeholder.jpg";
@@ -104,12 +145,11 @@
     p.contentEditable = "true";
     p.innerText = "Project details go here...";
 
-    div.append(img, h2, p);
+    div.append(delBtn, img, h2, p);
     container.appendChild(div);
     alert("✅ Added new project. Edit and click 'Save Changes'.");
   }
 
-  // Change photo
   function changeImage(img) {
     const input = document.createElement("input");
     input.type = "file";
@@ -127,7 +167,6 @@
     input.click();
   }
 
-  // Save all projects permanently
   function saveProjects() {
     const tx = db.transaction("projects", "readwrite");
     const store = tx.objectStore("projects");
@@ -135,8 +174,8 @@
 
     document.querySelectorAll(".project").forEach(p => {
       const img = p.querySelector("img");
-      const h2 = p.querySelector("h2").innerText;
-      const desc = p.querySelector("p").innerText;
+      const h2 = p.querySelector("h2").innerHTML;
+      const desc = p.querySelector("p").innerHTML;
       const imageData = img.dataset.imageData || img.src;
       store.add({ title: h2, desc, img: imageData });
     });
@@ -145,7 +184,6 @@
     tx.onerror = e => console.error("Save error:", e.target.error);
   }
 
-  // Load projects from IndexedDB
   function loadProjects() {
     const tx = db.transaction("projects", "readonly");
     const store = tx.objectStore("projects");
@@ -159,24 +197,55 @@
         const div = document.createElement("div");
         div.className = "project";
 
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-btn";
+        delBtn.innerText = "✖";
+        delBtn.onclick = () => { div.remove(); saveProjects(); };
+
         const img = document.createElement("img");
         img.src = proj.img || "placeholder.jpg";
         img.onclick = () => changeImage(img);
 
         const h2 = document.createElement("h2");
         h2.contentEditable = "true";
-        h2.innerText = proj.title;
+        h2.innerHTML = proj.title;
 
         const p = document.createElement("p");
         p.contentEditable = "true";
-        p.innerText = proj.desc;
+        p.innerHTML = proj.desc;
 
-        div.append(img, h2, p);
+        div.append(delBtn, img, h2, p);
         container.appendChild(div);
       });
     };
+  }
 
-    req.onerror = e => console.error("Load error:", e.target.error);
+  // 🎨 Text tools
+  function getSelectedElement() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return null;
+    return sel.focusNode.parentElement;
+  }
+
+  function applyFont() {
+    const element = getSelectedElement();
+    if (element) {
+      const font = document.getElementById("fontSelect").value;
+      element.style.fontFamily = font;
+    }
+  }
+
+  function applyColor() {
+    const element = getSelectedElement();
+    if (element) {
+      const color = document.getElementById("colorPicker").value;
+      element.style.color = color;
+    }
+  }
+
+  function createLink() {
+    const url = prompt("Enter URL (e.g. https://example.com):");
+    if (url) document.execCommand("createLink", false, url);
   }
 </script>
 
