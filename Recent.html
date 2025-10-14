@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recent Constructions – KIBSVIC LIMITED</title>
+  <style>
+    body { font-family: Arial; background: #f2f2f2; margin: 0; padding: 0; color: #333; }
+    header, footer { background-color: #2ecc71; color: white; padding: 15px 20px; text-align: center; }
+    .container { padding: 20px; max-width: 1000px; margin: auto; }
+    h1 { color: #2ecc71; }
+    .project {
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 15px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .project img {
+      width: 100%;
+      border-radius: 8px;
+      max-height: 300px;
+      object-fit: cover;
+      pointer-events: none; /* prevent click */
+    }
+    .project h2, .project p {
+      margin: 10px 0 5px;
+      user-select: text;
+    }
+    .back {
+      margin-top: 20px;
+      display: inline-block;
+      background: #2ecc71;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .back:hover {
+      background: #27ae60;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Recent Projects – KIBSVIC LIMITED</h1>
+</header>
+
+<div class="container" id="projectContainer">
+  <!-- Projects will be loaded here -->
+</div>
+
+<div class="container">
+  <a class="back" href="index.html">← Back to Home</a>
+</div>
+
+<footer>
+  &copy; 2025 KIBSVIC LIMITED
+</footer>
+
+<script>
+  // Read projects saved in localStorage by previous.html
+  window.onload = function() {
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    const container = document.getElementById("projectContainer");
+
+    if (savedProjects.length === 0) {
+      container.innerHTML = "<p>No projects available yet.</p>";
+      return;
+    }
+
+    savedProjects.forEach(project => {
+      const div = document.createElement("div");
+      div.className = "project";
+
+      const img = document.createElement("img");
+      img.src = project.img;
+      img.alt = "Project Image";
+
+      const h2 = document.createElement("h2");
+      h2.innerText = project.title;
+
+      const p = document.createElement("p");
+      p.innerText = project.desc;
+
+      div.appendChild(img);
+      div.appendChild(h2);
+      div.appendChild(p);
+
+      container.appendChild(div);
+    });
+  };
+</script>
+
+</body>
+</html>
