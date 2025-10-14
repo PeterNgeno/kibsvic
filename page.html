@@ -90,16 +90,16 @@
     <button onclick="window.location.href='contents/table.html'">Open Table Editor</button>
   </div>
 
-  <!-- ✅ Checkbox for table.html -->
+  <!-- ✅ Checkbox for previous.html -->
   <label style="display: flex; align-items: center; gap: 6px; margin-top: 20px;">
     <input type="checkbox" id="tableCheckbox" onclick="toggleTablePanel()" />
-    <span>Show Page Creator (Table)</span>
+    <span>Show previous page editor (Table)</span>
   </label>
 
   <div id="tablePanel" style="display: none; margin-top: 10px;">
     <button onclick="window.location.href='previous.html'">Previous page Editor</button>
   </div>
-  l
+  
   <script>
     // ✅ Redirect if not admin
     if (localStorage.getItem("admin") !== "true") {
