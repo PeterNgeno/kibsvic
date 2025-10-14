@@ -24,9 +24,18 @@
       object-fit: cover;
       cursor: pointer;
     }
-    .project h2, .project p {
+
+    /* ✅ Separate color for titles */
+    .project h2 {
+      color: #2ecc71; /* You can change this hex to any color you want */
       margin: 10px 0 5px;
     }
+
+    .project p {
+      margin: 10px 0 5px;
+      color: #333; /* Keep normal text color */
+    }
+
     .delete-btn {
       position: absolute;
       top: 10px;
