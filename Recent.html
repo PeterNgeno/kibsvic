@@ -21,7 +21,7 @@
       border-radius: 8px;
       max-height: 300px;
       object-fit: cover;
-      pointer-events: none; /* prevent click */
+      pointer-events: none;
     }
     .project h2, .project p {
       margin: 10px 0 5px;
@@ -48,7 +48,7 @@
 </header>
 
 <div class="container" id="projectContainer">
-  <!-- Projects will be loaded here -->
+  <p>Loading projects...</p>
 </div>
 
 <div class="container">
@@ -60,37 +60,58 @@
 </footer>
 
 <script>
-  // Read projects saved in localStorage by previous.html
-  window.onload = function() {
-    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    const container = document.getElementById("projectContainer");
+  let db;
+  const request = indexedDB.open("KIBSVIC_DB", 4);
 
-    if (savedProjects.length === 0) {
-      container.innerHTML = "<p>No projects available yet.</p>";
-      return;
-    }
-
-    savedProjects.forEach(project => {
-      const div = document.createElement("div");
-      div.className = "project";
-
-      const img = document.createElement("img");
-      img.src = project.img;
-      img.alt = "Project Image";
-
-      const h2 = document.createElement("h2");
-      h2.innerText = project.title;
-
-      const p = document.createElement("p");
-      p.innerText = project.desc;
-
-      div.appendChild(img);
-      div.appendChild(h2);
-      div.appendChild(p);
-
-      container.appendChild(div);
-    });
+  request.onsuccess = e => {
+    db = e.target.result;
+    loadProjects();
   };
+
+  request.onerror = e => {
+    console.error("DB error:", e.target.error);
+    document.getElementById("projectContainer").innerHTML = "<p>Error loading projects.</p>";
+  };
+
+  function loadProjects() {
+    const tx = db.transaction("projects", "readonly");
+    const store = tx.objectStore("projects");
+    const req = store.getAll();
+
+    req.onsuccess = e => {
+      const projects = e.target.result;
+      const container = document.getElementById("projectContainer");
+      container.innerHTML = "";
+
+      if (projects.length === 0) {
+        container.innerHTML = "<p>No projects available yet.</p>";
+        return;
+      }
+
+      projects.forEach(project => {
+        const div = document.createElement("div");
+        div.className = "project";
+
+        const img = document.createElement("img");
+        img.src = project.img;
+        img.alt = "Project Image";
+
+        const h2 = document.createElement("h2");
+        h2.innerHTML = project.title;
+
+        const p = document.createElement("p");
+        p.innerHTML = project.desc;
+
+        div.append(img, h2, p);
+        container.appendChild(div);
+      });
+    };
+
+    req.onerror = e => {
+      console.error("Read error:", e.target.error);
+      document.getElementById("projectContainer").innerHTML = "<p>Failed to load projects.</p>";
+    };
+  }
 </script>
 
 </body>
