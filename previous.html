@@ -70,26 +70,33 @@
 <script>
   // --- IndexedDB Setup ---
   let db;
-  const request = indexedDB.open("KIBSVIC_DB", 1);
+  const request = indexedDB.open("KIBSVIC_DB", 2);
+
   request.onupgradeneeded = e => {
     db = e.target.result;
-    db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
+    if (!db.objectStoreNames.contains("projects")) {
+      const store = db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
+      store.createIndex("title", "title", { unique: false });
+    }
   };
+
   request.onsuccess = e => {
     db = e.target.result;
     loadProjects();
   };
+
   request.onerror = e => console.error("DB error:", e.target.error);
 
   // --- Create Project Element ---
   function createProject(data = {}) {
     const div = document.createElement("div");
     div.className = "project";
+    div.dataset.id = data.id || "";
 
     const img = document.createElement("img");
-    img.src = data.img || "placeholder.jpg";
+    img.src = data.imgURL || "placeholder.jpg";
     img.alt = "Project Image";
-    img.onclick = () => changeImage(img);
+    img.onclick = () => changeImage(img, div);
 
     const h2 = document.createElement("h2");
     h2.contentEditable = "true";
@@ -111,40 +118,51 @@
     alert("New project added! Click image to replace, edit texts, then click 'Save Changes'.");
   }
 
-  // --- Change Image ---
-  function changeImage(imgElement) {
+  // --- Change Image (store blob instead of base64) ---
+  function changeImage(imgElement, projectDiv) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
     input.onchange = e => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = ev => {
-          imgElement.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
+        const objectURL = URL.createObjectURL(file);
+        imgElement.src = objectURL;
+        imgElement.dataset.blob = file; // store blob temporarily
       }
     };
     input.click();
   }
 
-  // --- Save All Projects ---
+  // --- Save All Projects (with Blobs) ---
   function saveProjects() {
     const tx = db.transaction("projects", "readwrite");
     const store = tx.objectStore("projects");
-    store.clear(); // clear old data
+    store.clear();
 
-    document.querySelectorAll(".project").forEach(p => {
-      const data = {
-        img: p.querySelector("img").src,
-        title: p.querySelector("h2").innerText,
-        desc: p.querySelector("p").innerText
-      };
-      store.add(data);
+    const projectEls = document.querySelectorAll(".project");
+    let count = 0;
+
+    projectEls.forEach(p => {
+      const title = p.querySelector("h2").innerText;
+      const desc = p.querySelector("p").innerText;
+      const blob = p.querySelector("img").dataset.blob;
+      const imgURL = p.querySelector("img").src;
+
+      if (blob) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          store.add({ title, desc, imgBlob: blob, imgURL: e.target.result });
+          count++;
+        };
+        reader.readAsDataURL(blob);
+      } else {
+        store.add({ title, desc, imgBlob: null, imgURL });
+        count++;
+      }
     });
 
-    tx.oncomplete = () => alert("✅ All changes saved successfully!");
+    tx.oncomplete = () => alert("✅ All changes saved successfully, including high-resolution images!");
     tx.onerror = e => console.error("Saving error:", e.target.error);
   }
 
@@ -159,8 +177,14 @@
 
     request.onsuccess = e => {
       const projects = e.target.result;
-      if (projects.length === 0) return;
-      projects.forEach(project => container.appendChild(createProject(project)));
+      projects.forEach(async project => {
+        if (project.imgBlob) {
+          // Convert blob to object URL
+          const blob = project.imgBlob instanceof Blob ? project.imgBlob : await fetch(project.imgURL).then(r => r.blob());
+          project.imgURL = URL.createObjectURL(blob);
+        }
+        container.appendChild(createProject(project));
+      });
     };
     request.onerror = e => console.error("Loading error:", e.target.error);
   }
