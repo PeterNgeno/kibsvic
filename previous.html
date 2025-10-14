@@ -35,10 +35,8 @@
       border-radius: 5px;
       text-decoration: none;
     }
-    .back:hover {
-      background: #27ae60;
-    }
-    .add-btn {
+    .back:hover { background: #27ae60; }
+    .add-btn, .save-btn {
       display: block;
       background: #27ae60;
       color: white;
@@ -48,253 +46,124 @@
       cursor: pointer;
       margin-top: 20px;
     }
-    .add-btn:hover {
-      background: #219150;
-    }
-    .save-btn {
-      display: block;
-      background: #1e88e5;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .save-btn:hover {
-      background: #1565c0;
-    }
-    .status {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #444;
-    }
-    .project-controls {
-      display:flex;
-      gap:8px;
-      margin-top:8px;
-    }
-    .delete-btn {
-      background: #e53935;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor:pointer;
-    }
-    .delete-btn:hover { background: #c62828; }
+    .add-btn:hover, .save-btn:hover { background: #219150; }
   </style>
 </head>
 <body>
 
 <header>
-  <!-- header is editable & will be saved -->
-  <h1 id="pageTitle" contenteditable="true">Recent Projects – KIBSVIC LIMITED</h1>
+  <h1 contenteditable="true">Recent Projects – KIBSVIC LIMITED</h1>
 </header>
 
 <div class="container" id="projectContainer"></div>
 
 <div class="container">
-  <div class="add-btn" id="addBtn">+ Add New Project</div>
-  <div class="save-btn" id="saveBtn">💾 Save Updates</div>
-  <div class="status" id="statusMsg"></div>
+  <div class="add-btn" onclick="addProject()">+ Add New Project</div>
+  <div class="save-btn" onclick="saveProjects()">💾 Save Changes</div>
   <a class="back" href="index.html">← Back to Home</a>
 </div>
 
-<footer>
-  <!-- footer editable & will be saved -->
-  <div id="pageFooter" contenteditable="true" style="padding:10px 20px; text-align:center;">
-    &copy; 2025 KIBSVIC LIMITED
-  </div>
+<footer contenteditable="true">
+  &copy; 2025 KIBSVIC LIMITED
 </footer>
 
 <script>
-(function(){
-  const projectContainer = document.getElementById('projectContainer');
-  const saveBtn = document.getElementById('saveBtn');
-  const addBtn = document.getElementById('addBtn');
-  const statusMsg = document.getElementById('statusMsg');
-  const pageTitle = document.getElementById('pageTitle');
-  const pageFooter = document.getElementById('pageFooter');
+  // --- IndexedDB Setup ---
+  let db;
+  const request = indexedDB.open("KIBSVIC_DB", 1);
+  request.onupgradeneeded = e => {
+    db = e.target.result;
+    db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
+  };
+  request.onsuccess = e => {
+    db = e.target.result;
+    loadProjects();
+  };
+  request.onerror = e => console.error("DB error:", e.target.error);
 
-  // Utility: check localStorage available
-  function storageAvailable() {
-    try {
-      const testKey = '__ls_test__';
-      localStorage.setItem(testKey, testKey);
-      localStorage.removeItem(testKey);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
+  // --- Create Project Element ---
+  function createProject(data = {}) {
+    const div = document.createElement("div");
+    div.className = "project";
 
-  function showStatus(msg, ok = true) {
-    statusMsg.textContent = msg;
-    statusMsg.style.color = ok ? '#2e7d32' : '#c62828';
-    if (ok) {
-      // fade out after 2.5s
-      setTimeout(() => { if (statusMsg.textContent === msg) statusMsg.textContent = ''; }, 2500);
-    }
-  }
+    const img = document.createElement("img");
+    img.src = data.img || "placeholder.jpg";
+    img.alt = "Project Image";
+    img.onclick = () => changeImage(img);
 
-  // Load projects + header/footer from localStorage
-  function loadProjects() {
-    projectContainer.innerHTML = '';
-    if (!storageAvailable()) {
-      showStatus('localStorage not available — changes will not persist.', false);
-      return;
-    }
-    try {
-      const saved = JSON.parse(localStorage.getItem('projects')) || [];
-      const savedTitle = localStorage.getItem('projects_pageTitle');
-      const savedFooter = localStorage.getItem('projects_pageFooter');
+    const h2 = document.createElement("h2");
+    h2.contentEditable = "true";
+    h2.innerText = data.title || "New Project Title";
 
-      if (savedTitle) pageTitle.innerText = savedTitle;
-      if (savedFooter) pageFooter.innerText = savedFooter;
+    const p = document.createElement("p");
+    p.contentEditable = "true";
+    p.innerText = data.desc || "Project details go here...";
 
-      if (saved.length === 0) {
-        // optionally show nothing
-      }
-
-      saved.forEach((p, idx) => {
-        projectContainer.appendChild(createProjectCard(p.img, p.title, p.desc, idx));
-      });
-    } catch (err) {
-      console.error('Load error', err);
-      showStatus('Failed to load saved data (console).', false);
-    }
-  }
-
-  // Create a project DOM card (with delete control)
-  function createProjectCard(imgSrc, title, desc, index) {
-    const div = document.createElement('div');
-    div.className = 'project';
-
-    const img = document.createElement('img');
-    img.src = imgSrc || 'placeholder.jpg';
-    img.alt = 'Project Image';
-    img.title = 'Click to replace image';
-    img.style.display = 'block';
-    img.addEventListener('click', () => replaceImage(img));
-
-    const h2 = document.createElement('h2');
-    h2.contentEditable = 'true';
-    h2.innerText = title || 'New Project Title';
-
-    const p = document.createElement('p');
-    p.contentEditable = 'true';
-    p.innerText = desc || 'Project details go here...';
-
-    // delete button to remove a project
-    const controls = document.createElement('div');
-    controls.className = 'project-controls';
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = 'Delete';
-    deleteBtn.addEventListener('click', () => {
-      if (confirm('Delete this project?')) {
-        div.remove();
-        // save after delete to persist change
-        saveProjects();
-      }
-    });
-    controls.appendChild(deleteBtn);
-
-    // Save on input events for immediate persistence
-    h2.addEventListener('input', saveProjectsDebounced);
-    p.addEventListener('input', saveProjectsDebounced);
-
-    div.appendChild(img);
-    div.appendChild(h2);
-    div.appendChild(p);
-    div.appendChild(controls);
-
+    div.append(img, h2, p);
     return div;
   }
 
-  // Debounce save to avoid too many writes while typing
-  let debounceTimer = null;
-  function saveProjectsDebounced() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => saveProjects(), 400);
-  }
-
-  // Replace image -> read as dataURL -> set src -> save and reload from storage to ensure persistence
-  function replaceImage(imgEl) {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.addEventListener('change', (ev) => {
-      const file = ev.target.files && ev.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        // set image src to dataURL
-        imgEl.src = e.target.result;
-        // save immediately, then reload UI from storage (ensures nothing stale remains)
-        saveProjects();
-        // reload to force canonical saved state (use setTimeout so disk writes finish)
-        setTimeout(loadProjects, 150);
-      };
-      reader.readAsDataURL(file);
-    });
-    fileInput.click();
-  }
-
-  // Collect and save all data (projects, header, footer)
-  function saveProjects() {
-    if (!storageAvailable()) {
-      showStatus('Cannot save — localStorage unavailable.', false);
-      return;
-    }
-    try {
-      const projects = [];
-      document.querySelectorAll('.project').forEach(card => {
-        const img = card.querySelector('img');
-        const h2 = card.querySelector('h2');
-        const p = card.querySelector('p');
-        projects.push({
-          img: img ? img.src : 'placeholder.jpg',
-          title: h2 ? h2.innerText.trim() : '',
-          desc: p ? p.innerText.trim() : ''
-        });
-      });
-      localStorage.setItem('projects', JSON.stringify(projects));
-      localStorage.setItem('projects_pageTitle', pageTitle.innerText.trim());
-      localStorage.setItem('projects_pageFooter', pageFooter.innerText.trim());
-      showStatus('Saved ✓', true);
-      console.log('Saved', projects.length, 'projects');
-    } catch (err) {
-      console.error('Save error', err);
-      showStatus('Error saving data (console).', false);
-    }
-  }
-
-  // Add a new project card and focus its title
+  // --- Add New Project ---
   function addProject() {
-    const newCard = createProjectCard('placeholder.jpg', 'New Project Title', 'Project details go here...', Date.now());
-    projectContainer.appendChild(newCard);
-    // bring focus to new project's title for quick edit
-    const newTitle = newCard.querySelector('h2');
-    newTitle.focus();
-    saveProjects();
+    const container = document.getElementById("projectContainer");
+    const newProject = createProject();
+    container.appendChild(newProject);
+    alert("New project added! Click image to replace, edit texts, then click 'Save Changes'.");
   }
 
-  // Hook up UI buttons
-  addBtn.addEventListener('click', addProject);
-  saveBtn.addEventListener('click', () => {
-    saveProjects();
-    // reload to reflect canonical saved state
-    setTimeout(loadProjects, 120);
-  });
+  // --- Change Image ---
+  function changeImage(imgElement) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          imgElement.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  }
 
-  // Save on beforeunload as a last attempt
-  window.addEventListener('beforeunload', () => saveProjects());
+  // --- Save All Projects ---
+  function saveProjects() {
+    const tx = db.transaction("projects", "readwrite");
+    const store = tx.objectStore("projects");
+    store.clear(); // clear old data
 
-  // Initial load
-  loadProjects();
-})();
+    document.querySelectorAll(".project").forEach(p => {
+      const data = {
+        img: p.querySelector("img").src,
+        title: p.querySelector("h2").innerText,
+        desc: p.querySelector("p").innerText
+      };
+      store.add(data);
+    });
+
+    tx.oncomplete = () => alert("✅ All changes saved successfully!");
+    tx.onerror = e => console.error("Saving error:", e.target.error);
+  }
+
+  // --- Load Projects ---
+  function loadProjects() {
+    const container = document.getElementById("projectContainer");
+    container.innerHTML = "";
+
+    const tx = db.transaction("projects", "readonly");
+    const store = tx.objectStore("projects");
+    const request = store.getAll();
+
+    request.onsuccess = e => {
+      const projects = e.target.result;
+      if (projects.length === 0) return;
+      projects.forEach(project => container.appendChild(createProject(project)));
+    };
+    request.onerror = e => console.error("Loading error:", e.target.error);
+  }
 </script>
 
 </body>
