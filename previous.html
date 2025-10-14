@@ -21,8 +21,9 @@
       border-radius: 8px;
       max-height: 300px;
       object-fit: cover;
+      cursor: pointer;
     }
-    .project h2 {
+    .project h2, .project p {
       margin: 10px 0 5px;
     }
     .back {
@@ -58,33 +59,7 @@
   <h1 contenteditable="true">Recent Projects – KIBSVIC LIMITED</h1>
 </header>
 
-<div class="container" id="projectContainer">
-  <div class="project" contenteditable="true">
-    <img src="IMG-20250707-WA0008.jpg" alt="Mini Bridge Project">
-    <h2>Mini Bridge – Nakuru County</h2>
-    <p>Completed June 2024 | A concrete mini-bridge over a seasonal river.</p>
-  </div>
-
-  <div class="project" contenteditable="true">
-    <img src="20250627_174453.jpg" alt="Box Culvert">
-    <h2>Box Culvert – Narok</h2>
-    <p>Installed June 2025 | Reinforced concrete box culvert for stormwater drainage.</p>
-  </div>
-
-  <div class="project" contenteditable="true">
-    <img src="Mulot (1).jpg" alt="Tripplet Box Culvert Project">
-    <h2>Tripplet Box Culvert – Bomet County</h2>
-    <p>Completed December 2022 | A concrete Tripplet Box Culvert across a perennial river.</p>
-  </div>
-
-  <div class="project" contenteditable="true">
-    <img src="Mulot.jpg" alt="Tripplet Box Culvert Project">
-    <h2>Tripplet Box Culvert – Bomet County</h2>
-    <p>Completed December 2022 | A concrete Tripplet Box Culvert across a perennial river.</p>
-  </div>
-
-  <!-- You can add more projects below -->
-</div>
+<div class="container" id="projectContainer"></div>
 
 <div class="container">
   <div class="add-btn" onclick="addProject()">+ Add New Project</div>
@@ -96,18 +71,79 @@
 </footer>
 
 <script>
+  // Load saved projects from localStorage
+  window.onload = function() {
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    const container = document.getElementById("projectContainer");
+    savedProjects.forEach(project => {
+      container.appendChild(createProject(project.img, project.title, project.desc));
+    });
+  };
+
+  function createProject(imgSrc, title, desc) {
+    const div = document.createElement("div");
+    div.className = "project";
+
+    const img = document.createElement("img");
+    img.src = imgSrc || "placeholder.jpg";
+    img.alt = "Project Image";
+    img.onclick = () => changeImage(img);
+
+    const h2 = document.createElement("h2");
+    h2.contentEditable = "true";
+    h2.innerText = title || "New Project Title";
+
+    const p = document.createElement("p");
+    p.contentEditable = "true";
+    p.innerText = desc || "Project details go here...";
+
+    div.appendChild(img);
+    div.appendChild(h2);
+    div.appendChild(p);
+
+    // Save automatically whenever text changes
+    h2.oninput = saveProjects;
+    p.oninput = saveProjects;
+
+    return div;
+  }
+
   function addProject() {
-    const container = document.getElementById('projectContainer');
-    const newProject = document.createElement('div');
-    newProject.className = 'project';
-    newProject.contentEditable = "true";
-    newProject.innerHTML = `
-      <img src="placeholder.jpg" alt="New Project">
-      <h2>New Project Title</h2>
-      <p>Project details go here...</p>
-    `;
+    const container = document.getElementById("projectContainer");
+    const newProject = createProject();
     container.appendChild(newProject);
-    alert('New project added! You can now replace text and image.');
+    saveProjects();
+    alert("New project added! You can edit text and click the image to replace it.");
+  }
+
+  function changeImage(imgElement) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imgElement.src = e.target.result;
+          saveProjects();
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  }
+
+  function saveProjects() {
+    const projects = [];
+    document.querySelectorAll(".project").forEach(p => {
+      projects.push({
+        img: p.querySelector("img").src,
+        title: p.querySelector("h2").innerText,
+        desc: p.querySelector("p").innerText
+      });
+    });
+    localStorage.setItem("projects", JSON.stringify(projects));
   }
 </script>
 
