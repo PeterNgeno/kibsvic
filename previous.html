@@ -68,125 +68,115 @@
 </footer>
 
 <script>
-  // --- IndexedDB Setup ---
   let db;
-  const request = indexedDB.open("KIBSVIC_DB", 2);
+  const request = indexedDB.open("KIBSVIC_DB", 3);
 
+  // Setup database
   request.onupgradeneeded = e => {
     db = e.target.result;
     if (!db.objectStoreNames.contains("projects")) {
-      const store = db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
-      store.createIndex("title", "title", { unique: false });
+      db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
     }
   };
 
   request.onsuccess = e => {
     db = e.target.result;
-    loadProjects();
+    loadProjects(); // load immediately
   };
 
   request.onerror = e => console.error("DB error:", e.target.error);
 
-  // --- Create Project Element ---
-  function createProject(data = {}) {
+  // Add new project
+  function addProject() {
+    const container = document.getElementById("projectContainer");
     const div = document.createElement("div");
     div.className = "project";
-    div.dataset.id = data.id || "";
 
     const img = document.createElement("img");
-    img.src = data.imgURL || "placeholder.jpg";
-    img.alt = "Project Image";
-    img.onclick = () => changeImage(img, div);
+    img.src = "placeholder.jpg";
+    img.onclick = () => changeImage(img);
 
     const h2 = document.createElement("h2");
     h2.contentEditable = "true";
-    h2.innerText = data.title || "New Project Title";
+    h2.innerText = "New Project Title";
 
     const p = document.createElement("p");
     p.contentEditable = "true";
-    p.innerText = data.desc || "Project details go here...";
+    p.innerText = "Project details go here...";
 
     div.append(img, h2, p);
-    return div;
+    container.appendChild(div);
+    alert("✅ Added new project. Edit and click 'Save Changes'.");
   }
 
-  // --- Add New Project ---
-  function addProject() {
-    const container = document.getElementById("projectContainer");
-    const newProject = createProject();
-    container.appendChild(newProject);
-    alert("New project added! Click image to replace, edit texts, then click 'Save Changes'.");
-  }
-
-  // --- Change Image (store blob instead of base64) ---
-  function changeImage(imgElement, projectDiv) {
+  // Change photo
+  function changeImage(img) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
     input.onchange = e => {
       const file = e.target.files[0];
-      if (file) {
-        const objectURL = URL.createObjectURL(file);
-        imgElement.src = objectURL;
-        imgElement.dataset.blob = file; // store blob temporarily
-      }
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        img.src = ev.target.result;
+        img.dataset.imageData = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     };
     input.click();
   }
 
-  // --- Save All Projects (with Blobs) ---
+  // Save all projects permanently
   function saveProjects() {
     const tx = db.transaction("projects", "readwrite");
     const store = tx.objectStore("projects");
     store.clear();
 
-    const projectEls = document.querySelectorAll(".project");
-    let count = 0;
-
-    projectEls.forEach(p => {
-      const title = p.querySelector("h2").innerText;
+    document.querySelectorAll(".project").forEach(p => {
+      const img = p.querySelector("img");
+      const h2 = p.querySelector("h2").innerText;
       const desc = p.querySelector("p").innerText;
-      const blob = p.querySelector("img").dataset.blob;
-      const imgURL = p.querySelector("img").src;
-
-      if (blob) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          store.add({ title, desc, imgBlob: blob, imgURL: e.target.result });
-          count++;
-        };
-        reader.readAsDataURL(blob);
-      } else {
-        store.add({ title, desc, imgBlob: null, imgURL });
-        count++;
-      }
+      const imageData = img.dataset.imageData || img.src;
+      store.add({ title: h2, desc, img: imageData });
     });
 
-    tx.oncomplete = () => alert("✅ All changes saved successfully, including high-resolution images!");
-    tx.onerror = e => console.error("Saving error:", e.target.error);
+    tx.oncomplete = () => alert("✅ All changes saved successfully!");
+    tx.onerror = e => console.error("Save error:", e.target.error);
   }
 
-  // --- Load Projects ---
+  // Load projects from IndexedDB
   function loadProjects() {
-    const container = document.getElementById("projectContainer");
-    container.innerHTML = "";
-
     const tx = db.transaction("projects", "readonly");
     const store = tx.objectStore("projects");
-    const request = store.getAll();
+    const req = store.getAll();
 
-    request.onsuccess = e => {
+    req.onsuccess = e => {
       const projects = e.target.result;
-      projects.forEach(async project => {
-        if (project.imgBlob) {
-          // Convert blob to object URL
-          const blob = project.imgBlob instanceof Blob ? project.imgBlob : await fetch(project.imgURL).then(r => r.blob());
-          project.imgURL = URL.createObjectURL(blob);
-        }
-        container.appendChild(createProject(project));
+      const container = document.getElementById("projectContainer");
+      container.innerHTML = "";
+      projects.forEach(proj => {
+        const div = document.createElement("div");
+        div.className = "project";
+
+        const img = document.createElement("img");
+        img.src = proj.img || "placeholder.jpg";
+        img.onclick = () => changeImage(img);
+
+        const h2 = document.createElement("h2");
+        h2.contentEditable = "true";
+        h2.innerText = proj.title;
+
+        const p = document.createElement("p");
+        p.contentEditable = "true";
+        p.innerText = proj.desc;
+
+        div.append(img, h2, p);
+        container.appendChild(div);
       });
     };
-    request.onerror = e => console.error("Loading error:", e.target.error);
+
+    req.onerror = e => console.error("Load error:", e.target.error);
   }
 </script>
 
