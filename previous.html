@@ -85,24 +85,28 @@
 </footer>
 
 <script>
-  // ✅ Load saved projects from localStorage
+  // ✅ Load all projects from localStorage
   window.onload = function() {
-    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    const container = document.getElementById("projectContainer");
-    savedProjects.forEach(project => {
-      container.appendChild(createProject(project.img, project.title, project.desc));
-    });
+    loadProjects();
   };
 
-  // ✅ Create project card
-  function createProject(imgSrc, title, desc) {
+  function loadProjects() {
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    const container = document.getElementById("projectContainer");
+    container.innerHTML = ""; // Clear before reloading
+    savedProjects.forEach((project, index) => {
+      container.appendChild(createProject(project.img, project.title, project.desc, index));
+    });
+  }
+
+  function createProject(imgSrc, title, desc, index) {
     const div = document.createElement("div");
     div.className = "project";
 
     const img = document.createElement("img");
     img.src = imgSrc || "placeholder.jpg";
     img.alt = "Project Image";
-    img.onclick = () => changeImage(img);
+    img.onclick = () => changeImage(img, index);
 
     const h2 = document.createElement("h2");
     h2.contentEditable = "true";
@@ -116,14 +120,14 @@
     div.appendChild(h2);
     div.appendChild(p);
 
-    // Auto-save when editing text
-    h2.oninput = saveProjects;
-    p.oninput = saveProjects;
+    // Save when editing
+    h2.oninput = () => saveProjects();
+    p.oninput = () => saveProjects();
 
     return div;
   }
 
-  // ✅ Add new project
+  // ✅ Add a new project
   function addProject() {
     const container = document.getElementById("projectContainer");
     const newProject = createProject();
@@ -132,8 +136,8 @@
     alert("New project added! You can edit text and click the image to replace it.");
   }
 
-  // ✅ Replace image
-  function changeImage(imgElement) {
+  // ✅ Change image and save immediately
+  function changeImage(imgElement, index) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -143,7 +147,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           imgElement.src = e.target.result;
-          saveProjects();
+          saveProjects(); // Save immediately
         };
         reader.readAsDataURL(file);
       }
@@ -151,21 +155,21 @@
     input.click();
   }
 
-  // ✅ Save all projects to localStorage
+  // ✅ Save all projects
   function saveProjects() {
     const projects = [];
     document.querySelectorAll(".project").forEach(p => {
       projects.push({
         img: p.querySelector("img").src,
-        title: p.querySelector("h2").innerText,
-        desc: p.querySelector("p").innerText
+        title: p.querySelector("h2").innerText.trim(),
+        desc: p.querySelector("p").innerText.trim()
       });
     });
     localStorage.setItem("projects", JSON.stringify(projects));
-    console.log("Projects saved!");
+    console.log("✅ Projects saved");
   }
 
-  // ✅ Save before leaving page
+  // ✅ Always save before closing the page
   window.addEventListener("beforeunload", saveProjects);
 </script>
 
