@@ -90,14 +90,14 @@
     <button onclick="window.location.href='contents/table.html'">Open Table Editor</button>
   </div>
 
-  <!-- ✅ Checkbox for previous.html -->
+  <!-- ✅ Checkbox for previous.html (FIXED IDs) -->
   <label style="display: flex; align-items: center; gap: 6px; margin-top: 20px;">
-    <input type="checkbox" id="tableCheckbox" onclick="toggleTablePanel()" />
-    <span>Show previous page editor (Table)</span>
+    <input type="checkbox" id="previousCheckbox" onclick="togglePreviousPanel()" />
+    <span>Show Previous Page Editor (Table)</span>
   </label>
 
-  <div id="tablePanel" style="display: none; margin-top: 10px;">
-    <button onclick="window.location.href='previous.html'">Previous page Editor</button>
+  <div id="previousPanel" style="display: none; margin-top: 10px;">
+    <button onclick="window.location.href='previous.html'">Previous Page Editor</button>
   </div>
   
   <script>
@@ -154,6 +154,13 @@
     function toggleTablePanel() {
       const panel = document.getElementById("tablePanel");
       const checked = document.getElementById("tableCheckbox").checked;
+      panel.style.display = checked ? "block" : "none";
+    }
+
+    // ✅ Toggle for previous.html (NEW)
+    function togglePreviousPanel() {
+      const panel = document.getElementById("previousPanel");
+      const checked = document.getElementById("previousCheckbox").checked;
       panel.style.display = checked ? "block" : "none";
     }
 
