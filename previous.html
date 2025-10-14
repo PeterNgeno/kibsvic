@@ -37,50 +37,79 @@
     .back:hover {
       background: #27ae60;
     }
+    .add-btn {
+      display: block;
+      background: #27ae60;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .add-btn:hover {
+      background: #219150;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Recent Projects – KIBSVIC LIMITED</h1>
+  <h1 contenteditable="true">Recent Projects – KIBSVIC LIMITED</h1>
 </header>
 
-<div class="container">
-  <div class="project">
+<div class="container" id="projectContainer">
+  <div class="project" contenteditable="true">
     <img src="IMG-20250707-WA0008.jpg" alt="Mini Bridge Project">
     <h2>Mini Bridge – Nakuru County</h2>
-    <p>Completed June 2024 | A concrete mini-bridge over seasonal river.</p>
+    <p>Completed June 2024 | A concrete mini-bridge over a seasonal river.</p>
   </div>
 
-  <div class="project">
+  <div class="project" contenteditable="true">
     <img src="20250627_174453.jpg" alt="Box Culvert">
     <h2>Box Culvert – Narok</h2>
     <p>Installed June 2025 | Reinforced concrete box culvert for stormwater drainage.</p>
   </div>
 
-  <div class="container">
-  <div class="project">
-    <img src="Mulot (1).jpg" alt="Tripplet Box culvert Project">
-    <h2>Tripplet Box Culvert– Bomet County</h2>
-    <p>Completed December 2022 | A concrete Tripplet Box Culvert Perennial river.</p>
-  </div>
-
-    <div class="container">
-  <div class="project">
-    <img src="
-      Mulot.jpg" alt="Tripplet Box culvert Project">
+  <div class="project" contenteditable="true">
+    <img src="Mulot (1).jpg" alt="Tripplet Box Culvert Project">
     <h2>Tripplet Box Culvert – Bomet County</h2>
-    <p>Completed December 2022| A concrete Tripplet Box Culvert Perennial river.</p>
+    <p>Completed December 2022 | A concrete Tripplet Box Culvert across a perennial river.</p>
   </div>
 
-  <!-- Add more projects here -->
-  
+  <div class="project" contenteditable="true">
+    <img src="Mulot.jpg" alt="Tripplet Box Culvert Project">
+    <h2>Tripplet Box Culvert – Bomet County</h2>
+    <p>Completed December 2022 | A concrete Tripplet Box Culvert across a perennial river.</p>
+  </div>
+
+  <!-- You can add more projects below -->
+</div>
+
+<div class="container">
+  <div class="add-btn" onclick="addProject()">+ Add New Project</div>
   <a class="back" href="index.html">← Back to Home</a>
 </div>
 
-<footer>
+<footer contenteditable="true">
   &copy; 2025 KIBSVIC LIMITED
 </footer>
+
+<script>
+  function addProject() {
+    const container = document.getElementById('projectContainer');
+    const newProject = document.createElement('div');
+    newProject.className = 'project';
+    newProject.contentEditable = "true";
+    newProject.innerHTML = `
+      <img src="placeholder.jpg" alt="New Project">
+      <h2>New Project Title</h2>
+      <p>Project details go here...</p>
+    `;
+    container.appendChild(newProject);
+    alert('New project added! You can now replace text and image.');
+  }
+</script>
 
 </body>
 </html>
