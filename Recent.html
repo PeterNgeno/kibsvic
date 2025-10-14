@@ -23,9 +23,13 @@
       object-fit: cover;
       pointer-events: none;
     }
-    .project h2, .project p {
+    .project h2 {
       margin: 10px 0 5px;
-      user-select: text;
+      color: #2ecc71; /* ✅ separate title color */
+    }
+    .project p {
+      margin: 10px 0 5px;
+      color: #333;
     }
     .back {
       margin-top: 20px;
@@ -61,11 +65,17 @@
 
 <script>
   let db;
-  const request = indexedDB.open("KIBSVIC_DB", 4);
+  const request = indexedDB.open("KIBSVIC_DB", 4); // ✅ same DB name and version as previous.html
 
   request.onsuccess = e => {
     db = e.target.result;
-    loadProjects();
+
+    // Ensure database is ready before loading
+    if (db.objectStoreNames.contains("projects")) {
+      loadProjects();
+    } else {
+      document.getElementById("projectContainer").innerHTML = "<p>No projects store found.</p>";
+    }
   };
 
   request.onerror = e => {
