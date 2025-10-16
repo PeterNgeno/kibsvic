@@ -63,28 +63,34 @@
   &copy; 2025 KIBSVIC LIMITED
 </footer>
 
-<script>
-  let db;
-  const request = indexedDB.open("KIBSVIC_DB", 5);
+<!-- Firebase SDKs -->
+<script type="module">
+  // --- Import Firebase modules ---
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-  request.onupgradeneeded = e => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("projects")) {
-      db.createObjectStore("projects", { keyPath: "id", autoIncrement: true });
-    }
+  // --- Your Firebase config ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjUIP2d_94uVS825WCZwW7Bn_InazB4to",
+    authDomain: "kibsvic-48ba2.firebaseapp.com",
+    projectId: "kibsvic-48ba2",
+    storageBucket: "kibsvic-48ba2.firebasestorage.app",
+    messagingSenderId: "805273446777",
+    appId: "1:805273446777:web:97ee092666e66d06b227a8",
+    measurementId: "G-0TWM73M8M8"
   };
 
-  request.onsuccess = e => {
-    db = e.target.result;
-    loadProjects();
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Load projects when page opens
+  window.onload = async function() {
+    await loadProjects();
   };
 
-  request.onerror = e => {
-    console.error("IndexedDB error:", e.target.error);
-    loadFromLocalStorage();
-  };
-
-  function addProject() {
+  async function addProject() {
     const container = document.getElementById("projectContainer");
     const div = document.createElement("div");
     div.className = "project";
@@ -92,7 +98,7 @@
     const delBtn = document.createElement("button");
     delBtn.className = "delete-btn";
     delBtn.innerText = "✖";
-    delBtn.onclick = () => { div.remove(); saveProjects(); };
+    delBtn.onclick = () => { div.remove(); };
 
     const img = document.createElement("img");
     img.src = "placeholder.jpg";
@@ -111,65 +117,56 @@
     alert("✅ Added new project. Edit and click 'Save Changes'.");
   }
 
-  function changeImage(img) {
+  async function changeImage(img) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    input.onchange = e => {
+    input.onchange = async e => {
       const file = e.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        img.src = ev.target.result;
-        img.dataset.imageData = ev.target.result;
-        saveProjects(); // Auto-save image instantly
-      };
-      reader.readAsDataURL(file);
+
+      try {
+        const storageRef = ref(storage, "projects/" + file.name);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        img.src = url;
+        img.dataset.imageUrl = url;
+        alert("✅ Image uploaded successfully!");
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("❌ Failed to upload image");
+      }
     };
     input.click();
   }
 
-  function saveProjects() {
-    if (!db) { saveToLocalStorage(); return; }
+  async function saveProjects() {
+    const projects = document.querySelectorAll(".project");
+    const collectionRef = collection(db, "projects");
 
-    const tx = db.transaction("projects", "readwrite");
-    const store = tx.objectStore("projects");
-    store.clear();
+    for (let i = 0; i < projects.length; i++) {
+      const p = projects[i];
+      const img = p.querySelector("img").dataset.imageUrl || p.querySelector("img").src;
+      const title = p.querySelector("h2").innerText;
+      const desc = p.querySelector("p").innerText;
 
-    const data = [];
-    document.querySelectorAll(".project").forEach(p => {
-      const img = p.querySelector("img");
-      const h2 = p.querySelector("h2").innerHTML;
-      const desc = p.querySelector("p").innerHTML;
-      const imageData = img.dataset.imageData || img.src;
-      const proj = { title: h2, desc, img: imageData };
-      store.add(proj);
-      data.push(proj);
-    });
+      await setDoc(doc(collectionRef, "project_" + i), {
+        title,
+        desc,
+        img
+      });
+    }
 
-    tx.oncomplete = () => {
-      localStorage.setItem("projects_backup", JSON.stringify(data));
-      alert("✅ All changes saved permanently!");
-    };
-    tx.onerror = e => {
-      console.error("Save error:", e.target.error);
-      saveToLocalStorage();
-    };
+    alert("✅ All projects saved online to Firebase!");
   }
 
-  function loadProjects() {
-    const tx = db.transaction("projects", "readonly");
-    const store = tx.objectStore("projects");
-    const req = store.getAll();
-
-    req.onsuccess = e => {
-      const projects = e.target.result;
-      if (projects.length === 0) {
-        loadFromLocalStorage();
-        return;
-      }
-      displayProjects(projects);
-    };
+  async function loadProjects() {
+    const snapshot = await getDocs(collection(db, "projects"));
+    const projects = [];
+    snapshot.forEach(docSnap => {
+      projects.push(docSnap.data());
+    });
+    displayProjects(projects);
   }
 
   function displayProjects(projects) {
@@ -182,7 +179,10 @@
       const delBtn = document.createElement("button");
       delBtn.className = "delete-btn";
       delBtn.innerText = "✖";
-      delBtn.onclick = () => { div.remove(); saveProjects(); };
+      delBtn.onclick = async () => {
+        await deleteDoc(doc(db, "projects", "project_" + proj.title));
+        div.remove();
+      };
 
       const img = document.createElement("img");
       img.src = proj.img || "placeholder.jpg";
@@ -190,33 +190,15 @@
 
       const h2 = document.createElement("h2");
       h2.contentEditable = "true";
-      h2.innerHTML = proj.title;
+      h2.innerText = proj.title;
 
       const p = document.createElement("p");
       p.contentEditable = "true";
-      p.innerHTML = proj.desc;
+      p.innerText = proj.desc;
 
       div.append(delBtn, img, h2, p);
       container.appendChild(div);
     });
-  }
-
-  // 🧩 LocalStorage fallback
-  function saveToLocalStorage() {
-    const data = [];
-    document.querySelectorAll(".project").forEach(p => {
-      const img = p.querySelector("img");
-      const h2 = p.querySelector("h2").innerHTML;
-      const desc = p.querySelector("p").innerHTML;
-      data.push({ title: h2, desc, img: img.dataset.imageData || img.src });
-    });
-    localStorage.setItem("projects_backup", JSON.stringify(data));
-    alert("💾 Saved locally for safety (offline backup).");
-  }
-
-  function loadFromLocalStorage() {
-    const data = JSON.parse(localStorage.getItem("projects_backup") || "[]");
-    if (data.length > 0) displayProjects(data);
   }
 </script>
 
