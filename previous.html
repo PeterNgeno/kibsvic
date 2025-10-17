@@ -2,12 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Recent Constructions – KIBSVIC LIMITED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recent Projects – KIBSVIC LIMITED</title>
 <style>
-  body { font-family: Arial; background: #f2f2f2; margin: 0; padding: 0; color: #333; }
-  header, footer { background-color: #2ecc71; color: white; padding: 15px 20px; text-align: center; }
-  .container { padding: 20px; max-width: 1000px; margin: auto; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  header, footer {
+    background-color: #2ecc71;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+  }
+  .container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
   h1 { color: #2ecc71; }
   .project {
     background: white;
@@ -24,23 +39,40 @@
     object-fit: cover;
     cursor: pointer;
   }
-  .project h2 { color: #2ecc71; margin: 10px 0 5px; }
   .delete-btn {
-    position: absolute; top: 10px; right: 10px;
-    background: #e74c3c; color: white;
-    border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
   }
   .delete-btn:hover { background: #c0392b; }
   .add-btn, .save-btn {
-    display: block; background: #27ae60; color: white;
-    text-align: center; padding: 10px; border-radius: 8px;
-    cursor: pointer; margin-top: 20px;
+    display: block;
+    background: #27ae60;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
   }
   .add-btn:hover, .save-btn:hover { background: #219150; }
+  .font-picker, .color-picker {
+    margin: 5px 0;
+  }
   .back {
-    margin-top: 20px; display: inline-block;
-    background: #2ecc71; color: white; padding: 10px 20px;
-    border-radius: 5px; text-decoration: none;
+    margin-top: 20px;
+    display: inline-block;
+    background: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
   }
   .back:hover { background: #27ae60; }
 </style>
@@ -63,144 +95,119 @@
   &copy; 2025 KIBSVIC LIMITED
 </footer>
 
-<!-- Firebase SDKs -->
-<script type="module">
-  // --- Import Firebase modules ---
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+<script>
+const CLOUD_NAME = "dexu7ajwh";
+const UPLOAD_PRESET = "unsigned"; // Create an unsigned preset in Cloudinary dashboard
 
-  // --- Your Firebase config ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjUIP2d_94uVS825WCZwW7Bn_InazB4to",
-    authDomain: "kibsvic-48ba2.firebaseapp.com",
-    projectId: "kibsvic-48ba2",
-    storageBucket: "kibsvic-48ba2.firebasestorage.app",
-    messagingSenderId: "805273446777",
-    appId: "1:805273446777:web:97ee092666e66d06b227a8",
-    measurementId: "G-0TWM73M8M8"
-  };
+function addProject(title = "New Project", desc = "Project details go here...", imgUrl = "https://via.placeholder.com/600x300") {
+  const container = document.getElementById("projectContainer");
+  const div = document.createElement("div");
+  div.className = "project";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+  const delBtn = document.createElement("button");
+  delBtn.className = "delete-btn";
+  delBtn.innerText = "✖";
+  delBtn.onclick = () => { div.remove(); saveProjects(); };
 
-  // Load projects when page opens
-  window.onload = async function() {
-    await loadProjects();
-  };
+  const img = document.createElement("img");
+  img.src = imgUrl;
+  img.onclick = () => uploadToCloudinary(img);
 
-  async function addProject() {
-    const container = document.getElementById("projectContainer");
-    const div = document.createElement("div");
-    div.className = "project";
+  const h2 = document.createElement("h2");
+  h2.contentEditable = "true";
+  h2.innerText = title;
 
-    const delBtn = document.createElement("button");
-    delBtn.className = "delete-btn";
-    delBtn.innerText = "✖";
-    delBtn.onclick = () => { div.remove(); };
+  const titleColor = document.createElement("input");
+  titleColor.type = "color";
+  titleColor.className = "color-picker";
+  titleColor.oninput = () => { h2.style.color = titleColor.value; saveProjects(); };
 
-    const img = document.createElement("img");
-    img.src = "placeholder.jpg";
-    img.onclick = () => changeImage(img);
+  const titleFont = document.createElement("select");
+  titleFont.className = "font-picker";
+  ["Arial", "Verdana", "Georgia", "Courier New", "Times New Roman"].forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f; opt.textContent = f;
+    titleFont.appendChild(opt);
+  });
+  titleFont.onchange = () => { h2.style.fontFamily = titleFont.value; saveProjects(); };
 
-    const h2 = document.createElement("h2");
-    h2.contentEditable = "true";
-    h2.innerText = "New Project Title";
+  const p = document.createElement("p");
+  p.contentEditable = "true";
+  p.innerText = desc;
 
-    const p = document.createElement("p");
-    p.contentEditable = "true";
-    p.innerText = "Project details go here...";
+  const textColor = document.createElement("input");
+  textColor.type = "color";
+  textColor.className = "color-picker";
+  textColor.oninput = () => { p.style.color = textColor.value; saveProjects(); };
 
-    div.append(delBtn, img, h2, p);
-    container.appendChild(div);
-    alert("✅ Added new project. Edit and click 'Save Changes'.");
-  }
+  const textFont = document.createElement("select");
+  textFont.className = "font-picker";
+  ["Arial", "Verdana", "Georgia", "Courier New", "Times New Roman"].forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f; opt.textContent = f;
+    textFont.appendChild(opt);
+  });
+  textFont.onchange = () => { p.style.fontFamily = textFont.value; saveProjects(); };
 
-  async function changeImage(img) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = async e => {
-      const file = e.target.files[0];
-      if (!file) return;
+  div.append(delBtn, img, h2, titleColor, titleFont, p, textColor, textFont);
+  container.appendChild(div);
+}
 
-      try {
-        const storageRef = ref(storage, "projects/" + file.name);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        img.src = url;
-        img.dataset.imageUrl = url;
-        alert("✅ Image uploaded successfully!");
-      } catch (err) {
-        console.error("Upload error:", err);
-        alert("❌ Failed to upload image");
-      }
-    };
-    input.click();
-  }
+async function uploadToCloudinary(imgElement) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
 
-  async function saveProjects() {
-    const projects = document.querySelectorAll(".project");
-    const collectionRef = collection(db, "projects");
-
-    for (let i = 0; i < projects.length; i++) {
-      const p = projects[i];
-      const img = p.querySelector("img").dataset.imageUrl || p.querySelector("img").src;
-      const title = p.querySelector("h2").innerText;
-      const desc = p.querySelector("p").innerText;
-
-      await setDoc(doc(collectionRef, "project_" + i), {
-        title,
-        desc,
-        img
-      });
-    }
-
-    alert("✅ All projects saved online to Firebase!");
-  }
-
-  async function loadProjects() {
-    const snapshot = await getDocs(collection(db, "projects"));
-    const projects = [];
-    snapshot.forEach(docSnap => {
-      projects.push(docSnap.data());
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: "POST",
+      body: formData
     });
-    displayProjects(projects);
-  }
+    const data = await res.json();
+    imgElement.src = data.secure_url;
+    saveProjects();
+    alert("✅ Image uploaded successfully!");
+  };
+  input.click();
+}
 
-  function displayProjects(projects) {
-    const container = document.getElementById("projectContainer");
-    container.innerHTML = "";
-    projects.forEach(proj => {
-      const div = document.createElement("div");
-      div.className = "project";
+function saveProjects() {
+  const projects = [];
+  document.querySelectorAll(".project").forEach(p => {
+    projects.push({
+      title: p.querySelector("h2").innerText,
+      desc: p.querySelector("p").innerText,
+      img: p.querySelector("img").src,
+      titleColor: p.querySelectorAll(".color-picker")[0].value || "#2ecc71",
+      titleFont: p.querySelectorAll(".font-picker")[0].value || "Arial",
+      textColor: p.querySelectorAll(".color-picker")[1].value || "#333",
+      textFont: p.querySelectorAll(".font-picker")[1].value || "Arial"
+    });
+  });
+  localStorage.setItem("kibsvic_projects", JSON.stringify(projects));
+  alert("💾 All changes saved!");
+}
 
-      const delBtn = document.createElement("button");
-      delBtn.className = "delete-btn";
-      delBtn.innerText = "✖";
-      delBtn.onclick = async () => {
-        await deleteDoc(doc(db, "projects", "project_" + proj.title));
-        div.remove();
-      };
-
-      const img = document.createElement("img");
-      img.src = proj.img || "placeholder.jpg";
-      img.onclick = () => changeImage(img);
-
-      const h2 = document.createElement("h2");
-      h2.contentEditable = "true";
-      h2.innerText = proj.title;
-
-      const p = document.createElement("p");
-      p.contentEditable = "true";
-      p.innerText = proj.desc;
-
-      div.append(delBtn, img, h2, p);
-      container.appendChild(div);
+function loadProjects() {
+  const data = JSON.parse(localStorage.getItem("kibsvic_projects") || "[]");
+  if (data.length > 0) {
+    data.forEach(proj => {
+      addProject(proj.title, proj.desc, proj.img);
+      const project = document.querySelectorAll(".project")[document.querySelectorAll(".project").length - 1];
+      project.querySelector("h2").style.color = proj.titleColor;
+      project.querySelector("h2").style.fontFamily = proj.titleFont;
+      project.querySelector("p").style.color = proj.textColor;
+      project.querySelector("p").style.fontFamily = proj.textFont;
     });
   }
+}
+
+window.onload = loadProjects;
 </script>
-
 </body>
 </html>
