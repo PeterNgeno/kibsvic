@@ -5,9 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Recent Constructions – KIBSVIC LIMITED</title>
   <style>
-    body { font-family: Arial; background: #f2f2f2; margin: 0; padding: 0; color: #333; }
-    header, footer { background-color: #2ecc71; color: white; padding: 15px 20px; text-align: center; }
-    .container { padding: 20px; max-width: 1000px; margin: auto; }
+    body { 
+      font-family: Arial; 
+      background: #f2f2f2; 
+      margin: 0; 
+      padding: 0; 
+      color: #333; 
+    }
+    header, footer { 
+      background-color: #2ecc71; 
+      color: white; 
+      padding: 15px 20px; 
+      text-align: center; 
+    }
+    .container { 
+      padding: 20px; 
+      max-width: 1000px; 
+      margin: auto; 
+    }
     h1 { color: #2ecc71; }
     .project {
       background: white;
@@ -25,11 +40,9 @@
     }
     .project h2 {
       margin: 10px 0 5px;
-      color: #2ecc71; /* ✅ separate title color */
     }
     .project p {
       margin: 10px 0 5px;
-      color: #333;
     }
     .back {
       margin-top: 20px;
@@ -64,64 +77,40 @@
 </footer>
 
 <script>
-  let db;
-  const request = indexedDB.open("KIBSVIC_DB", 4); // ✅ same DB name and version as previous.html
+  function loadProjectsFromLocal() {
+    const data = JSON.parse(localStorage.getItem("kibsvic_projects") || "[]");
+    const container = document.getElementById("projectContainer");
+    container.innerHTML = "";
 
-  request.onsuccess = e => {
-    db = e.target.result;
-
-    // Ensure database is ready before loading
-    if (db.objectStoreNames.contains("projects")) {
-      loadProjects();
-    } else {
-      document.getElementById("projectContainer").innerHTML = "<p>No projects store found.</p>";
+    if (data.length === 0) {
+      container.innerHTML = "<p>No projects available yet.</p>";
+      return;
     }
-  };
 
-  request.onerror = e => {
-    console.error("DB error:", e.target.error);
-    document.getElementById("projectContainer").innerHTML = "<p>Error loading projects.</p>";
-  };
+    data.forEach(project => {
+      const div = document.createElement("div");
+      div.className = "project";
 
-  function loadProjects() {
-    const tx = db.transaction("projects", "readonly");
-    const store = tx.objectStore("projects");
-    const req = store.getAll();
+      const img = document.createElement("img");
+      img.src = project.img;
+      img.alt = "Project Image";
 
-    req.onsuccess = e => {
-      const projects = e.target.result;
-      const container = document.getElementById("projectContainer");
-      container.innerHTML = "";
+      const h2 = document.createElement("h2");
+      h2.innerText = project.title;
+      h2.style.color = project.titleColor || "#2ecc71";
+      h2.style.fontFamily = project.titleFont || "Arial";
 
-      if (projects.length === 0) {
-        container.innerHTML = "<p>No projects available yet.</p>";
-        return;
-      }
+      const p = document.createElement("p");
+      p.innerText = project.desc;
+      p.style.color = project.textColor || "#333";
+      p.style.fontFamily = project.textFont || "Arial";
 
-      projects.forEach(project => {
-        const div = document.createElement("div");
-        div.className = "project";
-
-        const img = document.createElement("img");
-        img.src = project.img;
-        img.alt = "Project Image";
-
-        const h2 = document.createElement("h2");
-        h2.innerHTML = project.title;
-
-        const p = document.createElement("p");
-        p.innerHTML = project.desc;
-
-        div.append(img, h2, p);
-        container.appendChild(div);
-      });
-    };
-
-    req.onerror = e => {
-      console.error("Read error:", e.target.error);
-      document.getElementById("projectContainer").innerHTML = "<p>Failed to load projects.</p>";
-    };
+      div.append(img, h2, p);
+      container.appendChild(div);
+    });
   }
+
+  window.onload = loadProjectsFromLocal;
 </script>
 
 </body>
